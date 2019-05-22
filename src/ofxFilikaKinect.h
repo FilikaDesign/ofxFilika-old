@@ -20,8 +20,6 @@ private:
 	// OpenCV image processing
 	ofxCvColorImage colorImg;
 	ofxCvGrayscaleImage grayImage; // grayscale depth image
-	ofxCvGrayscaleImage grayThreshNear; // the near thresholded image
-	ofxCvGrayscaleImage grayThreshFar; // the far thresholded image
 	ofxCvContourFinder contourFinder;  // Blob Detection
 
 	// Data stream buffer
@@ -35,18 +33,27 @@ public:
 	ofParameterGroup guiSensorFolder;
 	ofParameterGroup guiContourFinder;
 	ofParameterGroup guiMotorControlFolder;
+	ofParameterGroup guiMeshFolder;
+	ofParameterGroup guiBufferFolder;
+	ofParameter<int> guiBufferThresNear;
+	ofParameter<int> guiBufferThresFar;
+
 	ofParameterGroup guiOSC;
 
 	ofParameter<string> guiId;
-	ofParameter<bool> guiMeshEnable;
+	ofParameter<bool> guiBufferEnable;
 	ofParameter<bool> guiVidDepthEnable;
 	ofParameter<bool> guiVidRGBEnable;
+	ofParameter<bool> guiMeshEnable;
+
+	ofParameter<glm::vec2> guiBufferPos;
 	ofParameter<glm::vec2> guiMeshPos;
 	ofParameter<int> guiMeshStepSize;
 	ofParameter<int> guiMeshPointSize;
 	ofParameter<ofColor> guiMeshColor;
 	ofParameter<int> guiSensorNear;
 	ofParameter<int> guiSensorFar;
+
 
 	// Motor tilt controller
 	ofParameter<void> guiMotorUp;
@@ -55,7 +62,6 @@ public:
 
 
 	// ROI
-	ofParameter<bool> guiROIEnable;
 	ofParameter<glm::vec4> guiROI;
 
 	// BLOB Finder
@@ -100,7 +106,6 @@ public:
 		mesh.setMode(OF_PRIMITIVE_POINTS);
 		for (int y = 0; y < h; y += guiMeshStepSize) {
 			for (int x = 0; x < w; x += guiMeshStepSize) {
-
 				if (kinect->getDistanceAt(x, y) > kinect->getNearClipping() && kinect->getDistanceAt(x, y) < kinect->getFarClipping()) {
 					mesh.addColor(ofColor(guiMeshColor->r, guiMeshColor->g, guiMeshColor->b, guiMeshColor->a));
 					mesh.addVertex(kinect->getWorldCoordinateAt(x, y));
@@ -178,31 +183,34 @@ public:
 
 		isUseSerial = _isUseSerial;
 		guiId = _id;
-		guiMeshEnable = false;
+		guiBufferEnable = false;
 		// GUI
 		gui.setDefaultWidth(250);
 		gui.setup("SENSORS_GUI", "settings_ofxFilikaKinect.xml");
 		guiSensorFolder.setName("Sensor-" + guiId.get());
 		guiContourFinder.setName("Contour Finder");
 
-		guiROIEnable.set("Draw ROI", false);
 		guiROI.set("ROI", glm::vec4(100, 300, 600, 200), glm::vec4(0, 0, 0, 0), glm::vec4(2000, 2000, 2000, 2000));
-		guiSensorNear.set("Sensor Near Thres", 500, 0, 3000);
-		guiSensorFar.set("Sensor Far Thres", 4000, 0, 6000);
+		guiSensorNear.set("Sensor Near Thres", 200, 0, 255);
+		guiSensorFar.set("Sensor Far Thres", 70, 0, 255);
 
-
+		guiMeshEnable.set("Draw Mesh", false);
 		guiMeshPointSize.set("Mesh Point Size", 3, 1, 8);
 		guiMeshStepSize.set("Mesh Vert. Step", 4, 1, 16);
 		guiMeshPos.set("Mesh Pos", glm::vec2(0, 0), glm::vec2(-1000, -1000), glm::vec2(1000, 1000));
+		guiBufferPos.set("Buffer Pos", glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(ofGetWidth(), ofGetHeight()));
+
 		guiMeshColor.set("Mesh Color", ofColor(255, 255, 255, 100), ofColor(0, 0, 0, 0), ofColor(255, 255, 255, 255));
-		guiMeshEnable.set("Draw Mesh", false);
+		guiBufferEnable.set("Draw Buffer", false);
+		guiBufferThresNear.set("Buffer Near Thres", 230, 0, 255);
+		guiBufferThresFar.set("Buffer Far Thres", 70, 0, 255);
 
 		guiVidDepthEnable.set("Draw Depth Video", true);
 		guiVidRGBEnable.set("Draw RGB Video", true);
 
 		guiFindContours.set("Find Contours", false);
-		guiCVNearThres.set("Near CV Threshold", 230, 0, 255);
-		guiCVFarThres.set("Far CV Threshold", 70, 0, 255);
+		guiSensorNear.set("Sensor Near Thres", 500, 0, 3000);
+		guiSensorFar.set("Sensor Far Thres", 4000, 0, 6000);
 
 		guiMaxNumBlobs.set("Max Blob Number", 20, 1, 50);
 		guiMinBlobSize.set("Min Blob Size", 100, 10, 2000);
@@ -221,16 +229,27 @@ public:
 		guiOSCAdd.set("IP", "192.168.1.11");
 		guiOSCPort.set("PORT", "3333");
 
+		// GUI MESH FOLDER
+		guiMeshFolder.setName("MESH SETTINGS");
+		guiMeshFolder.add(guiMeshEnable);
+		guiMeshFolder.add(guiMeshPointSize);
+		guiMeshFolder.add(guiMeshStepSize);
+		guiMeshFolder.add(guiMeshPos);
+		guiMeshFolder.add(guiMeshColor);
+
+
 		// Add Controller to view
-		guiSensorFolder.add(guiROIEnable);
-		guiSensorFolder.add(guiROI);
-		guiSensorFolder.add(guiMeshPointSize);
-		guiSensorFolder.add(guiMeshStepSize);
+		
 		guiSensorFolder.add(guiSensorNear);
 		guiSensorFolder.add(guiSensorFar);
-		guiSensorFolder.add(guiMeshEnable);
-		guiSensorFolder.add(guiMeshPos);
-		guiSensorFolder.add(guiMeshColor);
+		guiSensorFolder.add(guiROI);
+
+		// BUFFER FOLDER
+		guiBufferFolder.setName("BUFFER IMAGE SETTINGS");
+		guiBufferFolder.add(guiBufferEnable);
+		guiBufferFolder.add(guiBufferThresNear);
+		guiBufferFolder.add(guiBufferThresFar);
+		guiBufferFolder.add(guiBufferPos);
 
 		// Add Motor Control
 		guiMotorControlFolder.setName("Sensor Motor Control");
@@ -244,8 +263,6 @@ public:
 
 		// contour Finder
 		guiContourFinder.add(guiFindContours);
-		//guiContourFinder.add(guiCVNearThres);
-		//guiContourFinder.add(guiCVFarThres);
 		guiContourFinder.add(guiMaxNumBlobs);
 		guiContourFinder.add(guiMinBlobSize);
 		guiContourFinder.add(guiMaxBlobSize);
@@ -262,6 +279,8 @@ public:
 		guiEnableOSC.addListener(this, &ofxFilikaKinect::onChangeOSCBtn);
 		guiEnableOSC.disableEvents();
 
+		gui.add(guiMeshFolder);
+		gui.add(guiBufferFolder);
 		gui.add(guiSensorFolder);
 	
 		gui.getGroup("Sensor-").setDefaultHeaderBackgroundColor(ofColor::greenYellow);
@@ -269,9 +288,12 @@ public:
 		gui.getGroup("Sensor-").setDefaultBorderColor(ofColor::greenYellow);
 		gui.getGroup("Sensor-").setDefaultBackgroundColor(ofColor(0, 0, 0, 200));
 
-		gui.getGroup("Sensor-").minimizeAll();
-
 		
+		gui.getGroup("Sensor-").minimizeAll();
+		gui.getGroup("MESH SETTINGS").minimizeAll();
+		gui.getGroup("MESH SETTINGS").minimize();
+		
+
 		// Load previous settings
 		gui.loadFromFile("settings_ofxFilikaKinect.xml");
 
@@ -313,17 +335,15 @@ public:
 		meshToPixCropped.clear();
 		colorImg.clear();
 		grayImage.clear();
-		grayThreshNear.clear();
-		grayThreshFar.clear();
+		
 		// Reallocate
 		meshToPix.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
 		meshToPixCropped.allocate(guiROI->z, guiROI->w, GL_RGB);
 		colorImg.allocate(guiROI->z, guiROI->w);
 		grayImage.allocate(guiROI->z, guiROI->w);
-		grayThreshNear.allocate(guiROI->z, guiROI->w);
-		grayThreshFar.allocate(guiROI->z, guiROI->w);
+
 		buffer.clear();
-		buffer.allocate(180 * 130 * 1);
+		buffer.allocate(guiROI->z * guiROI->w);
 	}
 
 	void update() {
@@ -347,23 +367,21 @@ public:
 				kinect->drawDepth(_x, _y + 120, 160, 120);
 		}
 
-		if (guiMeshEnable || guiEnableOSC || guiFindContours)
+		
+		if (guiBufferEnable || guiEnableOSC || guiFindContours)
 		{
+
 			meshToPix.begin();
 			ofClear(0, 0);
-			cam.begin();
-			ofPushMatrix();
-			ofTranslate(guiMeshPos->x, guiMeshPos->y, 0);
-			drawPointCloud(getDepthMesh());
-			ofPopMatrix();
-			cam.end();
+			drawFilteredDepth(kinect->getDepthPixels()).draw(0, 0);
 			meshToPix.end();
-
+			
 			// Crop to ROI
 			meshToPixCropped.begin();
 			ofClear(0, 0);
 			meshToPix.getTexture().drawSubsection(0, 0, guiROI->z, guiROI->w, guiROI->x, guiROI->y, guiROI->z, guiROI->w);
 			meshToPixCropped.end();
+
 
 			// load grayscale depth image from the kinect source
 			ofPixels meshToPixels;
@@ -378,43 +396,36 @@ public:
 			colorImg.dilate();
 			grayImage = colorImg;
 
-			/*grayThreshNear = grayImage;
-			grayThreshFar = grayImage;
-			grayThreshNear.threshold(guiCVFarThres, true);
-			grayThreshFar.threshold(guiCVNearThres);
-			cvAnd(grayThreshNear.getCvImage(), grayThreshFar.getCvImage(), grayImage.getCvImage(), NULL);
-			*/
 			// update the cv images
 			grayImage.flagImageChanged();
 		}
 
-		if (guiMeshEnable) {
+		if (guiBufferEnable) {
 
-			//meshToPixCropped.draw(guiROI->x, guiROI->y);
-			//grayImage.draw(guiROI->x, guiROI->y);
-			colorImg.draw(guiROI->x, guiROI->y);
-		}
-
-
-		if (guiFindContours) {
-
-
-
-			//grayImage.draw(guiROI->x, guiROI->y, guiROI->z, guiROI->w);
-			// find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
-			// also, find holes is set to true so we will get interior contours as well....
-			contourFinder.findContours(grayImage, guiMinBlobSize, guiMaxBlobSize, guiMaxNumBlobs, false);
-			//
-			contourFinder.draw(guiROI->x, guiROI->y);
-		}
-
-		if (guiROIEnable) {
+			ofPushMatrix();
+			//ofScale(-1,1);
+			ofTranslate(guiBufferPos->x , guiBufferPos->y, 0);
+			meshToPixCropped.draw(guiROI->x, guiROI->y);
 			//region of interest
 			ofPushStyle();
 			ofSetColor(ofColor(guiMeshColor->r, guiMeshColor->g, guiMeshColor->b, 255));
 			ofNoFill();
 			ofDrawRectangle(guiROI->x, guiROI->y, guiROI->z, guiROI->w);
 			ofPopStyle();
+			
+			ofPopMatrix();
+		}
+
+
+		if (guiFindContours) {
+
+			contourFinder.findContours(grayImage, guiMinBlobSize, guiMaxBlobSize, guiMaxNumBlobs, false);
+			//
+			ofPushMatrix();
+			//ofScale(-1,1);
+			ofTranslate(guiBufferPos->x, guiBufferPos->y, 0);
+			contourFinder.draw(guiROI->x, guiROI->y);
+			ofPopMatrix();
 		}
 
 
@@ -437,8 +448,37 @@ public:
 
 		}
 
+
+		if (guiMeshEnable) {
+			cam.begin();
+			ofPushMatrix();
+			ofTranslate(guiMeshPos->x, guiMeshPos->y, 0);
+			drawPointCloud(getDepthMesh());
+			ofPopMatrix();
+			cam.end();
+		}
 		gui.draw();
 		gui.setPosition(ofGetWidth() - gui.getWidth(), 0);
+	}
+
+	ofxCvGrayscaleImage drawFilteredDepth(ofPixels & px) {
+		ofxCvGrayscaleImage imgThreshNear; // the near thresholded image
+		ofxCvGrayscaleImage imgThreshFar; // the far thresholded image
+		ofxCvGrayscaleImage imgThres;
+
+		imgThres.allocate(kinect->getWidth(), kinect->getHeight());
+		imgThreshFar.allocate(kinect->getWidth(), kinect->getHeight());
+		imgThreshNear.allocate(kinect->getWidth(), kinect->getHeight());
+
+		imgThres.setFromPixels(px);
+		imgThreshFar = imgThres;
+		imgThreshNear = imgThres;
+
+		imgThreshNear.threshold(guiBufferThresNear, true);
+		imgThreshFar.threshold(guiBufferThresFar);
+		cvAnd(imgThreshNear.getCvImage(), imgThreshFar.getCvImage(), imgThres.getCvImage(), NULL);
+
+		return imgThres;
 	}
 
 	void drawPointCloud(ofMesh mesh) {
