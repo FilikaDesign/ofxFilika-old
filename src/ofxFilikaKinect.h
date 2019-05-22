@@ -27,10 +27,14 @@ private:
 	// Data stream buffer
 	ofBuffer buffer;
 
+	// tilt angle
+	int angle;
+
 public:
 	ofxPanel gui;
 	ofParameterGroup guiSensorFolder;
 	ofParameterGroup guiContourFinder;
+	ofParameterGroup guiMotorControlFolder;
 	ofParameterGroup guiOSC;
 
 	ofParameter<string> guiId;
@@ -43,6 +47,11 @@ public:
 	ofParameter<ofColor> guiMeshColor;
 	ofParameter<int> guiSensorNear;
 	ofParameter<int> guiSensorFar;
+
+	// Motor tilt controller
+	ofParameter<void> guiMotorUp;
+	ofParameter<void> guiMotorDown;
+	ofParameter<string> guiMotorAngle;
 
 
 	// ROI
@@ -91,6 +100,7 @@ public:
 		mesh.setMode(OF_PRIMITIVE_POINTS);
 		for (int y = 0; y < h; y += guiMeshStepSize) {
 			for (int x = 0; x < w; x += guiMeshStepSize) {
+
 				if (kinect->getDistanceAt(x, y) > kinect->getNearClipping() && kinect->getDistanceAt(x, y) < kinect->getFarClipping()) {
 					mesh.addColor(ofColor(guiMeshColor->r, guiMeshColor->g, guiMeshColor->b, guiMeshColor->a));
 					mesh.addVertex(kinect->getWorldCoordinateAt(x, y));
@@ -125,6 +135,25 @@ public:
 		}
 	}
 
+	void onGUIMotorMove(const void * sender) {
+		ofParameter<void> * button = (ofParameter<void>*)sender;
+		string nn = button->getName();
+
+		if (nn == "Move Up") {
+			angle++;
+			if (angle > 30)
+				angle = 30;
+		}
+		else {
+			angle--;
+			if (angle < -30)
+				angle = -30;
+		}
+
+		guiMotorAngle.set(ofToString(angle));
+		kinect->setCameraTiltAngle(angle);
+	}
+
 	void onChangeROI(glm::vec4 & e) {
 		allocateROI();
 	}
@@ -133,7 +162,6 @@ public:
 		if (e) {
 			if ((guiOSCAdd.get() != "") || (guiOSCPort.get() != "")) {
 				sender.setup(guiOSCAdd.get(), ofToInt(guiOSCPort.get()));
-				cout << "koko" << endl;
 			}
 			else {
 				ofSystemAlertDialog("IP Address or PORT not found");
@@ -180,6 +208,13 @@ public:
 		guiMinBlobSize.set("Min Blob Size", 100, 10, 2000);
 		guiMaxBlobSize.set("Max Blob Size", 2000, 10, 2000);
 
+		// Sensor Motor Tilt Control
+		guiMotorDown.addListener(this, &ofxFilikaKinect::onGUIMotorMove);
+		guiMotorUp.addListener(this, &ofxFilikaKinect::onGUIMotorMove);
+
+		guiMotorUp.set("Move Up");
+		guiMotorDown.set("Move Down");
+		guiMotorAngle.set("Tilt Angle","0");
 		// OSC
 		guiOSC.setName("OSC Parameters");
 		guiEnableOSC.set("Enable OSC", false);
@@ -196,6 +231,13 @@ public:
 		guiSensorFolder.add(guiMeshEnable);
 		guiSensorFolder.add(guiMeshPos);
 		guiSensorFolder.add(guiMeshColor);
+
+		// Add Motor Control
+		guiMotorControlFolder.setName("Sensor Motor Control");
+		guiMotorControlFolder.add(guiMotorDown);
+		guiMotorControlFolder.add(guiMotorUp);
+		guiMotorControlFolder.add(guiMotorAngle);
+		guiSensorFolder.add(guiMotorControlFolder);
 
 		guiSensorFolder.add(guiVidDepthEnable);
 		guiSensorFolder.add(guiVidRGBEnable);
@@ -230,9 +272,14 @@ public:
 		gui.getGroup("Sensor-").minimizeAll();
 
 		
-		
+		// Load previous settings
 		gui.loadFromFile("settings_ofxFilikaKinect.xml");
 
+		// If OSC Enabled, then start osc
+		if (guiEnableOSC) {
+			bool enableO = true;
+			onChangeOSCBtn(enableO);
+		}
 		
 
 		// init Kinect
@@ -250,9 +297,14 @@ public:
 			}
 		}
 
-		cout << "Sensor " << guiId << " is ready" << endl;
+		//cout << "Sensor " << guiId << " is ready" << endl;
 
 		allocateROI();
+
+		// Set the last motor tilt angle
+		//cout << guiMotorAngle << endl;
+		angle = ofToInt(guiMotorAngle);
+		kinect->setCameraTiltAngle(angle);
 	}
 
 	void allocateROI() {
