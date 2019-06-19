@@ -1,0 +1,438 @@
+//
+//  ofxFilikaColorButton.h
+//  drawingBoothv1
+//
+//  Created by alp tugan on 10/01/18.
+//
+//
+#ifndef ofxFilikaImageButton_h
+#define ofxFilikaImageButton_h
+
+#include "ofMain.h"
+//#include "ofxTweenzor.h"
+
+
+enum ofxFilikaImageButtonBgMode {
+	NONE,
+	CUSTOM,
+	RECTANGLE,
+	ELLIPSE
+};
+
+class ofxFilikaImageButton {
+
+public:
+	ofEvent<int> BUTTON_TOUCH_DOWN;
+	ofEvent<int> BUTTON_TOUCH_UP;
+
+	ofColor mainColor;
+	ofFbo fbo;
+	bool result;
+	bool isSelected;
+	bool isMouseEnabled;
+	bool isTouchEnabled;
+	int size;
+	int strokeSize;
+	ofImage imge;
+	ofImage imgePassive;
+	ofVec2f pivotPoint;
+
+	////////////////////////////////////////////////
+	// SETTERS & GETTERS
+	////////////////////////////////////////////////
+	/*void setMouseEnable(bool _val) {
+		isMouseEnabled = _val;
+		if (_val) {
+			ofRegisterMouseEvents(this);
+		}else {
+			ofUnregisterMouseEvents(this);
+		}
+			
+	}*/
+
+
+	void setTouchEnable(bool _val) {
+		isTouchEnabled = _val;
+
+		if (_val) {
+			ofRegisterTouchEvents(this);
+			if (isMouseEnabled) {
+				isMouseEnabled = false;
+				ofUnregisterMouseEvents(this);
+			}
+		}
+		else {
+			ofUnregisterTouchEvents(this);
+			if (!isMouseEnabled) {
+				isMouseEnabled = true;
+				ofRegisterMouseEvents(this);
+			}
+		}
+	}
+
+	void setSelected(bool _val) {
+		isSelected = _val;
+	}
+
+	void setAnimatable(bool _isAnimatable) {
+
+		isAnimatable = _isAnimatable;
+	}
+
+	void setPos(int _x, int _y) {
+		xpos = _x;
+		ypos = _y;
+	}
+
+	void setBackgroundShape(int _mode = 0) {
+		bgMode = _mode;
+	}
+
+	void setPassiveImage(string src) {
+		imgePassive.load(src);
+		imgePassive.resize(_w, _h);
+	}
+
+	void setPassive(bool _val) {
+		isPassiveMode = _val;
+	}
+
+	void setPivot(string _pivot) {
+		if (_pivot == "center") {
+			pivotPoint.x = getWidth() * 0.5;
+			pivotPoint.y = getHeight() * 0.5;
+		}
+	}
+
+	bool getIsPassive() {
+		return isPassiveMode;
+	}
+
+	void setBackGroundOpacity(int _val) {
+		_bgOpacity = _val;
+	}
+
+
+	ofColor getColor() {
+		return mainColor;
+	}
+
+	int getWidth() {
+		return _w;
+	}
+
+	int getHeight() {
+		return _h;
+	}
+
+	ofVec2f getPos() {
+		return ofVec2f(xpos, ypos);
+	}
+
+	string getSourcePath() {
+		return imgPath;
+	}
+
+	bool getIsEnabled() {
+		return isEnabledInteraction;
+	}
+
+	////////////////////////////////////////////////
+	// CONSTRUCTOR
+	////////////////////////////////////////////////
+	ofxFilikaImageButton() {
+		bId = 0;
+		isSelected = false;
+		_bgOpacity = 255;
+	}
+
+	// deconstructer
+	~ofxFilikaImageButton() {}
+
+
+	////////////////////////////////////////////////
+	// SETUP
+	////////////////////////////////////////////////
+	void setup(string _imgPath, int _size, int _id, int _bgMode = -1, ofVec2f _bgSize = ofVec2f(-1, -1), ofColor _mainColor = ofColor(0), bool _isAnimatable = true) {
+
+		ofSetCircleResolution(64);
+
+		isPassiveMode = false;
+
+		// register events for interaction
+		ofRegisterMouseEvents(this);
+		//ofRegisterTouchEvents(this);
+
+		isMouseEnabled = true;
+		isTouchEnabled = false;
+		isEnabledInteraction = true;
+
+		mainColor = _mainColor;
+		isAnimatable = _isAnimatable;
+		size = _size;
+		bgSize = _bgSize;
+		strokeSize = _size + 10;
+		bId = _id;
+		x2 = size * 2.0;
+		targetScale = 1;
+		scaleFac = 1;
+
+		if (_size == -1) {
+			_w = bgSize.x;
+			_h = bgSize.y;
+		}
+
+		scaleFac = 1;
+		imgPath = _imgPath;
+
+		btnAnimT = 0.125;
+		bgMode = _bgMode;
+
+
+		imge.load(imgPath);
+
+		if (_size == -1) {
+			_w = imge.getWidth();
+			_h = imge.getHeight();
+		}
+
+		if (size != -1)
+		{
+			float aspect = imge.getWidth() / imge.getHeight();
+			float gap = 0.75;
+
+			if (imge.getWidth() == max(imge.getWidth(), imge.getHeight())) {
+				//landscape
+				imge.resize(size * gap, (size / aspect) * gap);
+				_w = size * gap;
+				_h = (size / aspect) * gap;
+			}
+			else {
+				//portrait
+				imge.resize((size * aspect) * gap, size * gap);
+				_w = (size * aspect) * gap;
+				_h = size * gap;
+			}
+		}
+
+	}
+
+	////////////////////////////////////////////////
+	// SETTERS & GETTERS
+	////////////////////////////////////////////////
+	void draw(int _x, int _y) {
+
+		xpos = _x + pivotPoint.x; // Set position according to pivot value. Default: 0,0
+		ypos = _y + pivotPoint.y;
+
+		ofPushMatrix();
+
+		ofTranslate(xpos, ypos); // Move container to specified position
+
+		if (isAnimatable) // Set container animatable or not animatable : Default: true
+			scaleFac += (targetScale - scaleFac) * 0.8;
+
+		ofScale(scaleFac, scaleFac); // Scale Value of the container
+
+		if (bgMode == ofxFilikaImageButtonBgMode::CUSTOM) { // Set background color and shape ROUNDED RECTANGLE
+			ofPushMatrix();
+			ofRotate(45);
+			ofSetColor(mainColor);
+			ofDrawRectRounded(-size*0.5, -size*0.5, size, size, 30);
+			ofPopMatrix();
+		}
+		else if (bgMode == ofxFilikaImageButtonBgMode::RECTANGLE) { // Set background color and shape RECTANGLE
+			ofPushMatrix();
+			ofSetColor(mainColor);
+			ofDrawRectangle(-bgSize.x*0.5, -bgSize.y*0.5, bgSize.x, bgSize.y);
+			ofPopMatrix();
+		}
+		else if (bgMode == ofxFilikaImageButtonBgMode::ELLIPSE) { // Set background color and shape ELLIPSE
+			ofPushMatrix();
+			ofSetColor(mainColor);
+			ofDrawEllipse(0, 0, bgSize.x, bgSize.y);
+			ofPopMatrix();
+		}
+
+		ofSetColor(255, 255); // Add passive mode image
+		if (!isPassiveMode)
+			imge.draw(-imge.getWidth() * 0.5, -imge.getHeight() * 0.5);
+		else
+			imgePassive.draw(-imgePassive.getWidth() * 0.5, -imgePassive.getHeight() * 0.5);
+		if (isSelected) {
+			ofDrawCircle(0, strokeSize - 10, 3);
+		}
+		ofPopMatrix();
+	}
+
+
+	////////////////////////////////////////////////
+	// INTERACTION
+	////////////////////////////////////////////////
+	//--------------------------------------------------------------
+	void touchDown(ofTouchEventArgs & touch) {
+		hitBegin(touch.x, touch.y);
+	}
+
+	//--------------------------------------------------------------
+	void touchMoved(ofTouchEventArgs & touch) {
+
+	}
+
+	//--------------------------------------------------------------
+	void touchUp(ofTouchEventArgs & touch) {
+		//hitReleased(touch.x, touch.y);
+		hitReleasedOutside();
+	}
+
+	//--------------------------------------------------------------
+	void touchDoubleTap(ofTouchEventArgs & touch) {
+	}
+
+	//--------------------------------------------------------------
+	void touchCancelled(ofTouchEventArgs & touch) {
+		//hitReleasedOutside();
+	}
+
+
+	//--------------------------------------------------------------
+	void mouseScrolled(ofMouseEventArgs & args) {
+
+	}
+
+	//--------------------------------------------------------------
+	void mouseEntered(ofMouseEventArgs & args) {
+
+	}
+
+	//--------------------------------------------------------------
+	void mouseExited(ofMouseEventArgs & args) {
+		hitReleasedOutside();
+	}
+	//--------------------------------------------------------------
+	void mouseMoved(ofMouseEventArgs & args) {
+		//hit(args.x, args.y);
+	}
+
+	//--------------------------------------------------------------
+	void mouseDragged(ofMouseEventArgs & args) {
+		//hit(args.x, args.y);
+	}
+
+	//--------------------------------------------------------------
+	void mousePressed(ofMouseEventArgs & args) {
+		hitBegin(args.x, args.y);
+	}
+
+	//--------------------------------------------------------------
+	void mouseReleased(ofMouseEventArgs & args) {
+
+		hitReleasedOutside();
+	}
+
+	////////////////////////////////////////////////
+	// CONTAINER RELEASED HANDLER
+	////////////////////////////////////////////////
+	void hitReleased(float touch_x, float touch_y) {
+		
+		if (hit(touch_x, touch_y)) {
+			
+			if (isDown)
+			{
+				targetScale = 1.0;
+				ofNotifyEvent(BUTTON_TOUCH_UP, bId);
+				isDown = false;
+
+				cout << "isUp" << isDown << endl;
+			}
+			
+		}
+	}
+
+	////////////////////////////////////////////////
+	// CONTAINER PRESSED HANDLER
+	////////////////////////////////////////////////
+	void hitBegin(float touch_x, float touch_y) {
+		if (hit(touch_x, touch_y)) {
+
+			//if (isAnimatable)
+			targetScale = 0.8;
+			isDown = true;
+			ofNotifyEvent(BUTTON_TOUCH_DOWN, bId);
+
+			cout << "isDown " << isDown << endl;
+		}
+	}
+
+	void hitReleasedOutside() {
+		
+		if (isDown)
+		{
+			targetScale = 1.0;
+			ofNotifyEvent(BUTTON_TOUCH_UP, bId);
+			isDown = false;
+			cout << "outside " << isDown << endl;
+		}
+	}
+
+	////////////////////////////////////////////////
+	// HIT DETECTION
+	////////////////////////////////////////////////
+	bool hit(int _x, int _y) {
+
+		result = (_x < xpos + _w*0.5 && _x > xpos - _w*0.5 && _y > ypos - _h*0.5 && _y < ypos + _h*0.5) ? true : false;
+
+		return result;
+	}
+
+	////////////////////////////////////////////////
+	// DISABLE INTERACTION
+	////////////////////////////////////////////////
+	void disableInteraction() {
+		if (isEnabledInteraction) {
+			if(isMouseEnabled)
+				ofUnregisterMouseEvents(this);
+			
+			if(isTouchEnabled)
+				ofUnregisterTouchEvents(this);
+			isEnabledInteraction = false;
+		}
+	}
+
+	////////////////////////////////////////////////
+	// ENABLE INTERACTION
+	////////////////////////////////////////////////
+	void enableInteraction() {
+		if (!isEnabledInteraction) {
+			if (isMouseEnabled)
+				ofRegisterMouseEvents(this);
+
+			if (isTouchEnabled)
+				ofRegisterTouchEvents(this);
+			isEnabledInteraction = true;
+		}
+		
+	}
+
+private:
+	int xpos, ypos, w, hitx, hity, bId, h;
+	float scaleFac;
+	bool isAnimatable, delay;
+	int _w, _h;
+	int _bgOpacity;
+	bool isPassiveMode;
+	bool isEnabledInteraction;
+	string imgPath;
+	bool isDown;
+
+	// Tween Lib
+	float x1, x2, targetScale;
+	float btnAnimT;
+	int bgMode;
+	ofVec2f bgSize;
+	ofVec2f touchStartPos;
+	//  TweenParams params2;
+	//  TweenParams paramsS;
+};
+
+#endif /* ofxFilikaImageButton_h */

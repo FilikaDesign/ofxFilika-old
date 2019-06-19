@@ -34,11 +34,15 @@ class ofxFilikaRS232
 		string flowCtrlXml;
 		string response;
 		string serialDevPort;
+		string serialDevPortIndex;
 
 		int baudrate;
 		
 		bool isDebug;
 		bool success;
+
+	
+
 		// GUI
 		vector<ofParameter<void>> btnCommands;
 		ofParameter<string> btnBaudrate;
@@ -80,13 +84,28 @@ class ofxFilikaRS232
 
 		}
 
+		void setDeviceComPortIndex(string _comPort) {
+
+			serialDevPortIndex = _comPort;
+
+		}
+
+		string getDeviceComPortIndex() {
+
+			comPort = serialDevPortIndex;
+			serialDevPort = comPort;
+
+			return serialDevPortIndex;
+
+		}
+
 		void setDebug(bool _d) {
 			isDebug = _d;
 		}
 		void setSettingsParameters(string _settingsPath) {
 			xml.load(_settingsPath);
 
-			comPort		= xml.find("//root").getFirst().getChild("COM_PORT_NAME").getValue();
+			//comPort		= xml.find("//root").getFirst().getChild("COM_PORT_NAME").getValue();
 			baudrate	= ofToInt(xml.find("//root").getFirst().getChild("BAUDRATE").getValue());
 			dataBitsXml = xml.find("//root").getFirst().getChild("DATALEN").getValue();  
 			parityXml	= xml.find("//root").getFirst().getChild("PARITY_CHECK").getValue(); 
@@ -173,9 +192,8 @@ class ofxFilikaRS232
 			//cout << "xml bitti mi " << endl;
 
 		}
+		void getResponseSamsungPMF55() {
 
-		void getResponse() {
-			
 			try
 			{
 				// Read all bytes from the device;
@@ -185,7 +203,7 @@ class ofxFilikaRS232
 				{
 					std::size_t sz = device.readBytes(buffer, 1024);
 
-					response = "";
+					
 
 					for (std::size_t i = 0; i < sz; ++i)
 					{
@@ -195,9 +213,28 @@ class ofxFilikaRS232
 						}
 					}
 
-					//cout << "Response: " << response << endl;
 					
 
+					//response = "";
+					//so now lets search in the xml
+					int responseXMLLength = 39;
+					if (response.length() >= responseXMLLength) {
+						for (int i = 0; i < responses.size(); i++)
+						{
+
+							if (ofIsStringInString(responses[i], response)) {
+								string bName = xml.find("//root/RESPONSES/RESPONSE")[i].getAttribute("resp").getValue();
+								ofNotifyEvent(SERIAL_RECEIVED, bName);
+								break;
+							}
+						}
+
+						response = "";
+
+					}
+					
+					
+					/*
 					for (int i = 0; i < responses.size(); i++)
 					{
 						//string bName = xml.find("//root/RESPONSES/RESPONSE")[i].getValue();
@@ -205,12 +242,12 @@ class ofxFilikaRS232
 						if (responses[i] == response) {
 							string bName = xml.find("//root/RESPONSES/RESPONSE")[i].getAttribute("resp").getValue();
 							ofNotifyEvent(SERIAL_RECEIVED, bName);
-							//cout << bName << endl;
+							
 							break;
 						}
 					}
+					*/
 
-					
 				}
 			}
 			catch (const std::exception& exc)
@@ -219,23 +256,94 @@ class ofxFilikaRS232
 			}
 
 		}
-		void setup() {
+
+		void getResponseBenQ() {
+			
+			try
+			{
+				// Read all bytes from the device;
+				uint8_t buffer[1024];
+				
+				while (device.available() > 0)
+				{
+					std::size_t sz = device.readBytes(buffer, 1024);
+
+					bool endofSerialResponse = false;
+
+					for (std::size_t i = 0; i < sz; ++i)
+					{
+						response += "0x" + ofToUpper(ofToHex(buffer[i]));
+						response += ",";
+					}
+					
+					endofSerialResponse = ofIsStringInString(response, ",0x23,0x0D,0x0A");
+
+
+					//cout << response.find_last_of("0x23", 4) << endl;
+					
+					string splicedResponse = "";
+
+					if (endofSerialResponse) {
+						if (response.back() == ',') {
+							splicedResponse = response.substr(0, response.size() - 1);
+						}
+						//cout << "splicedResponse : " << splicedResponse  << " : " << endofSerialResponse << endl;
+						response = "";
+
+						
+			
+					}
+					
+					//so now lets search in the xml
+					for (int i = 0; i < responses.size(); i++)
+					{
+						//string bName = xml.find("//root/RESPONSES/RESPONSE")[i].getValue();
+						//responses[i] = bName;
+						//if (responses[i] == splicedResponse) {
+						if(ofIsStringInString(splicedResponse, responses[i])){
+							string bName = xml.find("//root/RESPONSES/RESPONSE")[i].getAttribute("resp").getValue();
+							ofNotifyEvent(SERIAL_RECEIVED, bName);
+							//cout << bName << endl;
+							//cout << "Response: " << response << endl;
+							//response = "";
+
+							break;
+						}
+					}
+					
+					
+					
+
+					//cout << "splicedResponse: " << splicedResponse << endl;
+
+					
+
+				
+				}
+			}
+			catch (const std::exception& exc)
+			{
+				ofLogError("ofApp::update") << exc.what();
+			}
+
+		}
+		void setup(string _configFile) {
 
 			devicesInfo = getDeviceList();
 			
-
+			response = "";
 			
 			if (!devicesInfo.empty())
 			{
 				// set Related parameters
-				setSettingsParameters("settings_rs232.xml");
+				setSettingsParameters(_configFile);
 				
 			
 				// Connect to the device.
 
 				///comPort
-				//cout << getDeviceComPort() << endl;
-				success = device.setup(getDeviceComPort(), baudrate, databit, parity, stopBit, flowCtrl);
+				cout <<  getDeviceComPortIndex() << endl;
+				success = device.setup(getDeviceComPortIndex(), baudrate, databit, parity, stopBit, flowCtrl);
 				initGUI();
 				if (success)
 				{
