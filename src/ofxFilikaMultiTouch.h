@@ -34,6 +34,10 @@ double getPinchScale(float _dist)
 		_scale = 4;
 	}
 
+	if (_scale < 1) {
+		_scale = 1;
+	}
+
 	return _scale;
 }
 
@@ -110,7 +114,7 @@ static bool handlePointerEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			return false;
 		}
 		pointer = &info.touch.pointerInfo;
-
+		touch.id = pointer->pointerId;
 		touch.width = info.touch.rcContact.right - info.touch.rcContact.left;
 		touch.height = info.touch.rcContact.bottom - info.touch.rcContact.top;
 		touch.angle = info.touch.orientation; // degrees 0-359
@@ -253,7 +257,7 @@ LRESULT DecodeGesture(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 			rotationGesture.center = glm::vec2(gi.ptsLocation.x - ofGetWindowPositionX(), gi.ptsLocation.y - ofGetWindowPositionY());
 			rotationGesture.rotation = rotationToRad(gi.ullArguments);
 
-			ofNotifyEvent(OFX_FILIKA_ROTATION_EVENT, rotationGesture);
+			//ofNotifyEvent(OFX_FILIKA_ROTATION_EVENT, rotationGesture);
 
 			bHandled = TRUE;
 			break;

@@ -7,7 +7,15 @@
 #pragma comment(lib, "iphlpapi.lib")
 #pragma comment(lib, "ws2_32.lib")
 
+#include "ofMain.h"
+
+/* TYPE DEFINITIONS */
+typedef enum { TR, ENG, ARABIC, FR } Language;
+
 class ofxFilikaUtils {
+private:
+	ofXml xml;
+
 public:
 	bool pingIpAdd(const char argv[], bool _verbose = false) {
 
@@ -93,5 +101,49 @@ public:
 		}
 
 		return result;
+	}
+
+	/* XML Operations */
+	void loadXml(string _src) {
+		xml.load(_src);
+	}
+
+	// should be called xml.find("//root/RESPONSES/RESPONSE").size();
+	int getNumTags(string _tagPath) {
+		return xml.find(_tagPath).size();
+	}
+
+	vector<string> getTagStringList(string _tagPath) {
+		vector<string> list;
+		list.resize(xml.find(_tagPath).size());
+
+		for (int i = 0; i < list.size(); i++)
+		{
+			list[i] = xml.find(_tagPath)[i].getValue();
+		}
+
+		return list;
+	}
+
+	vector<int> getTagIntList(string _tagPath) {
+		vector<int> list;
+		list.resize(xml.find(_tagPath).size());
+
+		for (int i = 0; i < list.size(); i++)
+		{
+			list[i] = xml.find(_tagPath)[i].getIntValue();
+		}
+
+		return list;
+	}
+
+	/* First Level */
+	string getTagValStr(string _tag) {
+		return xml.find("//root").getFirst().getChild(_tag).getValue();
+	}
+
+	/* Second Level */
+	string getTagValStr(string _tag, string _second_tag) {
+		return xml.find("//root").getFirst().getChild(_tag).getChild(_second_tag).getValue();
 	}
 };

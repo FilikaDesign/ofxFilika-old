@@ -5,61 +5,73 @@
 //  Created by alp tugan on 10/01/18.
 //
 //
-#ifndef ofxFilikaImageButton_h
-#define ofxFilikaImageButton_h
+#ifndef ofxFilikaDraggableButton_h
+#define ofxFilikaDraggableButton_h
 
 #include "ofMain.h"
 //#include "ofxTweenzor.h"
 
 
-enum ofxFilikaImageButtonBgMode {
-	NONE,
-	CUSTOM,
-	RECTANGLE,
-	ELLIPSE
-};
 
-enum ofxFilikaImageButtonPivot {
-	CENTER,
-	TOP_LEFT
-};
 
-class ofxFilikaImageButton {
+class ofxFilikaDraggableButton {
 private:
-	int xpos, ypos, w, hitx, hity, bId, h;
-	float scaleFac;
-	bool isAnimatable, delay;
-	int _w, _h;
-	int _bgOpacity;
-	bool isPassiveMode;
-	bool isEnabledInteraction;
-	string imgPath;
-	bool isDown;
-
-	// Tween Lib
-	float x1, x2, targetScale;
-	float btnAnimT;
-	int bgMode;
-	ofVec2f bgSize;
-	ofVec2f touchStartPos;
-	
-	ofTrueTypeFont * textFont;
-	string textStr;
-	ofColor textColor;
-	glm::vec2 textPos;
+    int saveX, saveY;
+    int xpos, ypos, w, hitx, hity, bId, h;
+    float scaleFac;
+    bool isAnimatable, delay;
+    int _w, _h;
+    int _bgOpacity;
+    bool isPassiveMode;
+    bool isEnabledInteraction;
+    string imgPath;
+    string pivot;
+    bool isDown;
+    bool isDragging;
+    bool isDraggingV;
+    bool isDraggingH;
+    
+    // Tween Lib
+    float x1, x2, targetScale;
+    float btnAnimT;
+    int bgMode;
+    int buttonMode;
+    ofVec2f bgSize;
+    ofVec2f touchStartPos;
+    int sbRoundness;
 public:
+
+	enum ofxFilikaImageButtonBgMode {
+		NONE,
+		CUSTOM,
+		RECTANGLE,
+		ELLIPSE
+	};
+
+	enum ofxFilikaButtonMode {
+		IMAGE,
+		SHAPE_ROUNRECT,
+		SHAPE_RECTANGLE,
+		SHAPE_ELLIPSE
+	};
+
 	ofEvent<int> BUTTON_TOUCH_DOWN;
 	ofEvent<int> BUTTON_TOUCH_UP;
+    ofEvent<ofVec2f> BUTTON_DRAGGING_VERTICAL;
 
 	ofColor mainColor;
+    ofColor _OVER_COLOR;
+    ofColor _PRESS_COLOR;
+    ofColor _OUT_COLOR;
 	ofFbo fbo;
 	bool result;
 	bool isSelected;
 	bool isMouseEnabled;
 	bool isTouchEnabled;
+    
 	int size;
 	int strokeSize;
-	int pivot;
+    
 	ofImage imge;
 	ofImage imgePassive;
 	ofVec2f pivotPoint;
@@ -76,16 +88,18 @@ public:
 		}
 			
 	}*/
-	void setOverlayFont(ofTrueTypeFont * _f, string _str, glm::vec2 _textPos, ofColor _textColor) {
-		textFont = _f;
-		textStr = _str;
-		textColor = _textColor;
-		textPos = _textPos;
+
+	void setRoundness(int _v) {
+		sbRoundness = _v;
 	}
 
-	void setOverlayText(string _str) {
-		textStr = _str;
-	}
+    void setDraggingVertical(bool _v) {
+        isDraggingV = _v;
+        //isDraggingH = _h;
+    }
+    void setButtonMode(ofxFilikaButtonMode _v) {
+        buttonMode = _v;
+    }
 
 	void setTouchEnable(bool _val) {
 		isTouchEnabled = _val;
@@ -134,16 +148,14 @@ public:
 	}
 
 	void setPivot(string _pivot) {
+        pivot = _pivot;
 		if (_pivot == "center") {
 			pivotPoint.x = getWidth() * 0.5;
 			pivotPoint.y = getHeight() * 0.5;
-			pivot = ofxFilikaImageButtonPivot::CENTER;
-		}
-		else if (_pivot == "tl") {
-			pivotPoint.x = 0;
-			pivotPoint.y = 0;
-			pivot = ofxFilikaImageButtonPivot::TOP_LEFT;
-		}
+        }else if (_pivot == "tl") {
+            pivotPoint.x = 0;
+            pivotPoint.y = 0;
+        }
 	}
 
 	bool getIsPassive() {
@@ -182,17 +194,51 @@ public:
 	////////////////////////////////////////////////
 	// CONSTRUCTOR
 	////////////////////////////////////////////////
-	ofxFilikaImageButton() {
+	ofxFilikaDraggableButton() {
 		bId = 0;
 		isSelected = false;
 		_bgOpacity = 255;
 	}
 
 	// deconstructer
-	~ofxFilikaImageButton() {}
+	~ofxFilikaDraggableButton() {}
 
-
-
+    ////////////////////////////////////////////////
+    // SETUP
+    ////////////////////////////////////////////////
+    void setup(ofVec2f _size, int _id, ofColor _mainColor = ofColor(0), bool _isAnimatable = false) {
+        
+        _OUT_COLOR = _mainColor;
+        _OVER_COLOR = ofColor(0, 100, 0, 255);
+        _PRESS_COLOR = ofColor(110, 110, 110, 255);
+        
+        isPassiveMode = false;
+        sbRoundness   = 5;
+        // register events for interaction
+        ofRegisterMouseEvents(this);
+        //ofRegisterTouchEvents(this);
+        
+        isMouseEnabled = true;
+        isTouchEnabled = false;
+        isEnabledInteraction = true;
+        buttonMode = ofxFilikaButtonMode::SHAPE_ROUNRECT;
+        
+        mainColor = _mainColor;
+        isAnimatable = _isAnimatable;
+   
+        bId = _id;
+        targetScale = 1;
+        scaleFac = 1;
+        
+        btnAnimT = 0.125;
+        bgMode = ofxFilikaImageButtonBgMode::NONE;
+        
+        
+        _w = _size.x;
+        _h = _size.y;
+        
+    }
+    
 	////////////////////////////////////////////////
 	// SETUP
 	////////////////////////////////////////////////
@@ -209,6 +255,7 @@ public:
 		isMouseEnabled = true;
 		isTouchEnabled = false;
 		isEnabledInteraction = true;
+        buttonMode = ofxFilikaButtonMode::IMAGE;
 
 		mainColor = _mainColor;
 		isAnimatable = _isAnimatable;
@@ -258,18 +305,18 @@ public:
 			}
 		}
 
-		setPivot("center");
-		pivot = ofxFilikaImageButtonPivot::CENTER;
 	}
 
 	////////////////////////////////////////////////
 	// SETTERS & GETTERS
 	////////////////////////////////////////////////
 	void draw(int _x, int _y) {
-
-		xpos = _x + pivotPoint.x; // Set position according to pivot value. Default: 0,0
-		ypos = _y + pivotPoint.y;
-
+        
+        
+        xpos = _x + pivotPoint.x; // Set position according to pivot value. Default: 0,0
+        ypos = _y + pivotPoint.y;
+        
+		
 		ofPushMatrix();
 
 		ofTranslate(xpos, ypos); // Move container to specified position
@@ -300,23 +347,25 @@ public:
 		}
 
 		ofSetColor(255, 255); // Add passive mode image
-		if (!isPassiveMode)
-			imge.draw(-pivotPoint.x, -pivotPoint.y);
-		else
-			imgePassive.draw(-pivotPoint.x, -pivotPoint.y);
-		if (isSelected) {
-			ofDrawCircle(0, strokeSize - 10, 3);
-		}
-
-		if (textStr != "") {
-			ofPushStyle();
-			ofSetColor(textColor);
-			textFont->drawString(textStr, textPos.x, textPos.y);
-			ofPopStyle();
-		}
-
+        if(buttonMode == ofxFilikaButtonMode::IMAGE) {
+            if (!isPassiveMode)
+                imge.draw(-imge.getWidth() * 0.5, -imge.getHeight() * 0.5);
+            else
+                imgePassive.draw(-imgePassive.getWidth() * 0.5, -imgePassive.getHeight() * 0.5);
+            if (isSelected) {
+                ofDrawCircle(0, strokeSize - 10, 3);
+            }
+        }else if(buttonMode == ofxFilikaButtonMode::SHAPE_ROUNRECT) {
+            ofSetColor(mainColor);
+            ofDrawRectRounded(ofRectangle(0,0,_w, _h), sbRoundness, sbRoundness, sbRoundness, sbRoundness);
+        }
+		
 		ofPopMatrix();
 	}
+    
+    void draw() {
+        
+    }
 
 
 	////////////////////////////////////////////////
@@ -344,7 +393,7 @@ public:
 
 	//--------------------------------------------------------------
 	void touchCancelled(ofTouchEventArgs & touch) {
-		hitReleasedOutside();
+		//hitReleasedOutside();
 	}
 
 
@@ -364,12 +413,13 @@ public:
 	}
 	//--------------------------------------------------------------
 	void mouseMoved(ofMouseEventArgs & args) {
-		//hit(args.x, args.y);
+        
 	}
 
 	//--------------------------------------------------------------
 	void mouseDragged(ofMouseEventArgs & args) {
-		//hit(args.x, args.y);
+        if(isDraggingH || isDraggingV)
+            hitAndDrag(args.x, args.y);
 	}
 
 	//--------------------------------------------------------------
@@ -382,7 +432,42 @@ public:
 
 		hitReleasedOutside();
 	}
-
+    
+    ////////////////////////////////////////////////
+    // CONTAINER DRAGGING HANDLER
+    ////////////////////////////////////////////////
+    void hitAndDrag(int _x, int _y) {
+        if(isDown) {
+            if(isDraggingV) {
+                ypos = _y - saveY;
+                ofVec2f p = ofVec2f(xpos, ypos);
+                ofNotifyEvent(BUTTON_DRAGGING_VERTICAL, p);
+            }
+        }
+    }
+    ////////////////////////////////////////////////
+    // CONTAINER PRESSED HANDLER
+    ////////////////////////////////////////////////
+    void hitBegin(float touch_x, float touch_y) {
+        if (hit(touch_x, touch_y)) {
+            // Save for Dragging
+            if(isDraggingV || isDraggingH) {
+                saveX = touch_x - xpos;
+                saveY = touch_y - ypos;
+            }
+            
+            
+            //if (isAnimatable)
+            targetScale = 0.8;
+            isDown = true;
+            ofNotifyEvent(BUTTON_TOUCH_DOWN, bId);
+            
+            mainColor = _PRESS_COLOR;
+            
+            //cout << "isDown " << isDown << endl;
+        }
+    }
+    
 	////////////////////////////////////////////////
 	// CONTAINER RELEASED HANDLER
 	////////////////////////////////////////////////
@@ -395,25 +480,12 @@ public:
 				targetScale = 1.0;
 				ofNotifyEvent(BUTTON_TOUCH_UP, bId);
 				isDown = false;
-
-				cout << "isUp" << isDown << endl;
+                
+                mainColor = _OUT_COLOR;
+                
+				//cout << "isUp" << isDown << endl;
 			}
 			
-		}
-	}
-
-	////////////////////////////////////////////////
-	// CONTAINER PRESSED HANDLER
-	////////////////////////////////////////////////
-	void hitBegin(float touch_x, float touch_y) {
-		if (hit(touch_x, touch_y)) {
-
-			//if (isAnimatable)
-			targetScale = 0.8;
-			isDown = true;
-			ofNotifyEvent(BUTTON_TOUCH_DOWN, bId);
-
-			cout << "isDown " << isDown << endl;
 		}
 	}
 
@@ -424,7 +496,8 @@ public:
 			targetScale = 1.0;
 			ofNotifyEvent(BUTTON_TOUCH_UP, bId);
 			isDown = false;
-			cout << "outside " << isDown << endl;
+			//cout << "outside " << isDown << endl;
+            mainColor = _OUT_COLOR;
 		}
 	}
 
@@ -432,12 +505,11 @@ public:
 	// HIT DETECTION
 	////////////////////////////////////////////////
 	bool hit(int _x, int _y) {
-
-		if(pivot == ofxFilikaImageButtonPivot::CENTER)
-			result = (_x < xpos + _w*0.5 && _x > xpos - _w*0.5 && _y > ypos - _h*0.5 && _y < ypos + _h*0.5) ? true : false;
-
-		else if(pivot == ofxFilikaImageButtonPivot::TOP_LEFT)
-			result = (_x > xpos && _x < xpos + _w && _y > ypos && _y < ypos + _h) ? true : false;
+        if(pivot == "center")
+            result = (_x < xpos + _w*0.5 && _x > xpos - _w*0.5 && _y > ypos - _h*0.5 && _y < ypos + _h*0.5) ? true : false;
+        
+        if(pivot == "tl")
+            result = (_x < xpos + _w && _x > xpos && _y > ypos && _y < ypos + _h) ? true : false;
 
 		return result;
 	}
@@ -470,6 +542,8 @@ public:
 		}
 		
 	}
+
+
 };
 
 #endif /* ofxFilikaImageButton_h */
