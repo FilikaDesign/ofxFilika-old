@@ -38,6 +38,14 @@ class ofxFilikaHapPlayer
 		}
 
 		/* SETTERS & GETTERS */
+		bool getIsVideoPlaying() {
+			return player[currentVid]->isPlaying();
+		}
+
+		float getVideoPosition() {
+			return player[currentVid]->getPosition();
+		}
+
 		void setSpeed(float _s,int _i) {
 			player[_i]->setSpeed(_s);
 		}
@@ -51,6 +59,14 @@ class ofxFilikaHapPlayer
 				player[_i]->setLoopState(OF_LOOP_NORMAL);
 			else
 				player[_i]->setLoopState(OF_LOOP_NONE);
+		}
+
+		void setPauseVideo() {
+			player[currentVid]->setPaused(true);
+		}
+
+		void setPosition(float _p) {
+			player[currentVid]->setPosition(_p);
 		}
 
 		void setPlayVideo() {
@@ -133,12 +149,12 @@ class ofxFilikaHapPlayer
 				if(player[currentVid]->isPlaying())
 					player[currentVid]->draw(vidX,vidY,vidW,vidH);
 
-				if (player[currentVid]->getIsMovieDone()) {
+				/*if (player[currentVid]->getIsMovieDone()) {
 					if (player[currentVid]->getLoopState() == OF_LOOP_NORMAL)
 						loadNext();
 					else
 						player[currentVid]->stop();
-				}
+				}*/
 			}
 		}
 
@@ -150,6 +166,11 @@ class ofxFilikaHapPlayer
 			}
 		}
 
+		void loadVideoById(int _id) {
+			currentVid = _id;
+			player[currentVid]->stop();
+			player[currentVid]->play();
+		}
 		/*void setVideoPlayMode(int _id, bool _loopState)
 		{
 			player[currentVid]->play();

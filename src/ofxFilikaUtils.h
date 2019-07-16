@@ -15,6 +15,7 @@ typedef enum { TR, ENG, ARABIC, FR } Language;
 class ofxFilikaUtils {
 private:
 	ofXml xml;
+	string xmlFile;
 
 public:
 	bool pingIpAdd(const char argv[], bool _verbose = false) {
@@ -105,6 +106,7 @@ public:
 
 	/* XML Operations */
 	void loadXml(string _src) {
+		xmlFile = _src;
 		xml.load(_src);
 	}
 
@@ -145,5 +147,24 @@ public:
 	/* Second Level */
 	string getTagValStr(string _tag, string _second_tag) {
 		return xml.find("//root").getFirst().getChild(_tag).getChild(_second_tag).getValue();
+	}
+
+	void setTagIntValue(string _path, int _index, int _val, bool _autoSave = true) {
+		xml.find(_path)[_index].set(_val);
+		if(_autoSave) writeXml(xmlFile);
+	}
+
+	void setTagStringValue(string _path, int _index, string _val, bool _autoSave = true) {
+		xml.find(_path)[_index].set(_val);
+		if (_autoSave) writeXml(xmlFile);
+	}
+
+	void setTagFloatValue(string _path, int _index, float _val, bool _autoSave = true) {
+		xml.find(_path)[_index].set(_val);
+		if (_autoSave) writeXml(xmlFile);
+	}
+
+	void writeXml(string _fileName) {
+		xml.save(_fileName);
 	}
 };

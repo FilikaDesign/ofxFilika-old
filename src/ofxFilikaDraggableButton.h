@@ -38,6 +38,7 @@ private:
     int buttonMode;
     ofVec2f bgSize;
     ofVec2f touchStartPos;
+	ofVec2f interactionArea;
     int sbRoundness;
 public:
 
@@ -158,6 +159,10 @@ public:
         }
 	}
 
+	void setInteractionArea(ofVec2f _a) {
+		interactionArea = _a;
+	}
+
 	bool getIsPassive() {
 		return isPassiveMode;
 	}
@@ -236,6 +241,9 @@ public:
         
         _w = _size.x;
         _h = _size.y;
+
+		interactionArea.x = _w;
+		interactionArea.y = _h;
         
     }
     
@@ -279,7 +287,8 @@ public:
 		bgMode = _bgMode;
 
 
-		imge.load(imgPath);
+		if(imgPath != "")
+			imge.load(imgPath);
 
 		if (_size == -1) {
 			_w = imge.getWidth();
@@ -305,6 +314,8 @@ public:
 			}
 		}
 
+		interactionArea.x = _w;
+		interactionArea.y = _h;
 	}
 
 	////////////////////////////////////////////////
@@ -506,10 +517,17 @@ public:
 	////////////////////////////////////////////////
 	bool hit(int _x, int _y) {
         if(pivot == "center")
-            result = (_x < xpos + _w*0.5 && _x > xpos - _w*0.5 && _y > ypos - _h*0.5 && _y < ypos + _h*0.5) ? true : false;
+            result = (_x < xpos + interactionArea.x*0.5 && _x > xpos - interactionArea.x*0.5 && _y > ypos - interactionArea.y*0.5 && _y < ypos + interactionArea.y*0.5) ? true : false;
         
-        if(pivot == "tl")
-            result = (_x < xpos + _w && _x > xpos && _y > ypos && _y < ypos + _h) ? true : false;
+		if (pivot == "tl") {
+			if (_w == interactionArea.x && _h == interactionArea.y) {
+				result = (_x < xpos + interactionArea.x && _x > xpos && _y > ypos && _y < ypos + interactionArea.y) ? true : false;
+			}
+			
+			if(_w < interactionArea.x || _h < interactionArea.y) {
+				result = (_x < xpos + _w + (interactionArea.x - _w) * 0.5 && _x > xpos - (interactionArea.x - _w) * 0.5 && _y > ypos && _y < ypos + interactionArea.y) ? true : false;
+			}
+		}
 
 		return result;
 	}

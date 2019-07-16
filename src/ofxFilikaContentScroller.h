@@ -22,7 +22,7 @@ private:
     
     bool isScrollBarVisible;
     
-    
+	int saveX, saveY;
     int sbW;
     int sbH;
     
@@ -30,12 +30,46 @@ private:
     int scH;
     
     int sbRoundness;
-    
+
+	int moveAmty;
     int sbGap;
     ofColor sbColor;
     ofColor scColor;
     
+	void isDraggingHandler(ofVec2f & _p) {
+		moveContent(_p);
+	}
+
 public:
+	void enableInteraction() {
+#ifdef TOUCH_ENABLE
+		ofAddListener(ofEvents().touchMoved, this, &ofxFilikaContentScroller::moveContentTouchHandler);
+#else
+		ofAddListener(ofEvents().mouseDragged, this, &ofxFilikaContentScroller::moveMouseContent);
+		ofAddListener(ofEvents().mousePressed, this, &ofxFilikaContentScroller::moveMouseContentPressed);
+#endif	
+		if (isScrollBarVisible)
+			ofRemoveListener(scrollerBtn.BUTTON_DRAGGING_VERTICAL, this, &ofxFilikaContentScroller::isDraggingHandler);
+
+		ofAddListener(scrollerBtn.BUTTON_DRAGGING_VERTICAL, this, &ofxFilikaContentScroller::isDraggingHandler);
+
+		isScrollBarVisible = false;
+	}
+
+	void disableInteraction() {
+		
+#ifdef TOUCH_ENABLE
+		ofRemoveListener(ofEvents().touchMoved, this, &ofxFilikaContentScroller::moveContentTouchHandler);
+#else
+		ofRemoveListener(ofEvents().mousePressed, this, &ofxFilikaContentScroller::moveMouseContentPressed);
+		ofRemoveListener(ofEvents().mouseDragged, this, &ofxFilikaContentScroller::moveMouseContent);
+#endif	
+		if (isScrollBarVisible)
+			ofRemoveListener(scrollerBtn.BUTTON_DRAGGING_VERTICAL, this, &ofxFilikaContentScroller::isDraggingHandler);
+
+		isScrollBarVisible = false;
+		
+	}
     void setup(ofRectangle _contentRect, ofBaseDraws * _content = nullptr, int _sbGap = 1) {
         this->set(_contentRect);
         
@@ -47,31 +81,65 @@ public:
         sbH     = 0;
         scW     = 15;
         scH     = 0;
-        
+		moveAmty = 0;
+
 		if (_content != nullptr)
 			setContent(_content);
+		
+		enableInteraction();
+    }
 
-    }
-    
-    void isDraggingHandler(ofVec2f & _p) {
-        scrollerRect.y = _p.y;
-        if(_p.y < scrollBarRect.y) {
-            scrollerRect.y = scrollBarRect.y;
-        }
-        
-        int maxYVal = scrollBarRect.y + scrollBarRect.height - scrollerBtn.getHeight();
-        if(_p.y > maxYVal) {
-            scrollerRect.y = maxYVal;
-        }
-        
-        int moveAmty = scrollBarRect.y + ofMap(scrollerRect.y, scrollBarRect.y, maxYVal, scrollBarRect.y, scrollBarRect.y + content->getHeight() - scrollBarRect.height)*-1;
-        
-        contentFbo.begin();
-        ofClear(0,0);
-        content->draw(0, moveAmty);
-        contentFbo.end();
-    }
-    
+#ifdef TOUCH_ENABLE
+	void moveContentTouchHandler(ofTouchEventArgs  & e) {
+		ofLog() << "TOUCH e.x: " << e.x << " e.y:" << e.y;
+	}
+#else
+	void moveMouseContentPressed(ofMouseEventArgs & e) {
+		if (e.x > this->x && e.x < this->x + this->getWidth() && e.y > this->y && e.y < this->y + this->getHeight()) {
+			//saveX = e.x - scrollerBtn.getPos().x;
+			ofLog() << "mn oluyor";
+			saveY = e.y;
+		}
+	}
+
+	void moveMouseContent(ofMouseEventArgs & e) {
+		//
+		if (e.x > this->x && e.x < this->x + this->getWidth() && e.y > this->y && e.y < this->y + this->getHeight()) {
+			ofLog() << "TOUCH e.x: " << e.y << " e.y:" << e.y - saveY;
+			
+			//moveAmty = scrollBarRect.y + ofMap(e.y, scrollBarRect.y, scrollBarRect.getHeight(), scrollBarRect.y, scrollBarRect.y + content->getHeight() - scrollBarRect.height)*1;
+
+			/*contentFbo.begin();
+			ofClear(0, 0);
+			content->draw(0, e.y - saveY);
+			contentFbo.end();*/
+			moveContent(ofVec2f(0, e.y ),1);
+		}
+			
+	}
+#endif	
+
+	void moveContent(ofVec2f _p, int _dir = -1) {
+
+		
+		scrollerRect.y = _p.y;
+		if (_p.y < scrollBarRect.y) {
+			scrollerRect.y = scrollBarRect.y;
+		}
+
+		int maxYVal = scrollBarRect.y + scrollBarRect.height - scrollerBtn.getHeight();
+		if (_p.y > maxYVal) {
+			scrollerRect.y = maxYVal;
+		}
+
+		moveAmty = scrollBarRect.y + ofMap(scrollerRect.y, scrollBarRect.y, maxYVal, scrollBarRect.y, scrollBarRect.y + content->getHeight() - scrollBarRect.height)*_dir;
+
+		contentFbo.begin();
+		ofClear(0, 0);
+		content->draw(0, moveAmty);
+		contentFbo.end();
+	}
+
     void draw() {
 		if (content != nullptr)
 		{
@@ -97,16 +165,6 @@ public:
     }
     
     // SETTERTS & GETTERS
-	void setPositon(int _x, int _y) {
-		x = _x;
-		y = _y;
-
-		scrollBarRect.x = x + width + sbGap;
-		scrollBarRect.y = y;
-
-		scrollerRect.x = scrollBarRect.x;
-	}
-
     void setContent(ofBaseDraws * _content) {
 		content = _content;
 		mask.clear();
@@ -141,7 +199,7 @@ public:
 			scrollerBtn.setPivot("tl");
 			scrollerBtn.setRoundness(sbRoundness);
 			scrollerBtn.setDraggingVertical(true);
-		
+			scrollerBtn.setInteractionArea(ofVec2f(scrollerRect.width + 40, scrollerRect.height));
 
 			if(isScrollBarVisible)
 				ofRemoveListener(scrollerBtn.BUTTON_DRAGGING_VERTICAL, this, &ofxFilikaContentScroller::isDraggingHandler);
@@ -157,6 +215,20 @@ public:
 		}
     }
     
+	void setPositionScrobber(int _y) {
+		//scrollerBtn.setPos();
+	}
+
+	void setPositon(int _x, int _y) {
+		x = _x;
+		y = _y;
+
+		scrollBarRect.x = x + width + sbGap;
+		scrollBarRect.y = y;
+
+		scrollerRect.x = scrollBarRect.x;
+	}
+
 	void setContentRect(ofRectangle & _r) {
 		this->set(_r);
 	}

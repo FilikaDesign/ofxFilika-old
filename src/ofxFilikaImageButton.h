@@ -11,12 +11,12 @@
 #include "ofMain.h"
 //#include "ofxTweenzor.h"
 
-
 enum ofxFilikaImageButtonBgMode {
 	NONE,
 	CUSTOM,
 	RECTANGLE,
-	ELLIPSE
+	ELLIPSE,
+	IMAGE
 };
 
 enum ofxFilikaImageButtonPivot {
@@ -27,6 +27,7 @@ enum ofxFilikaImageButtonPivot {
 class ofxFilikaImageButton {
 private:
 	int xpos, ypos, w, hitx, hity, bId, h;
+	int buttonMode;
 	float scaleFac;
 	bool isAnimatable, delay;
 	int _w, _h;
@@ -40,6 +41,7 @@ private:
 	float x1, x2, targetScale;
 	float btnAnimT;
 	int bgMode;
+
 	ofVec2f bgSize;
 	ofVec2f touchStartPos;
 	
@@ -83,8 +85,17 @@ public:
 		textPos = _textPos;
 	}
 
-	void setOverlayText(string _str) {
+	void setOverlayText(string _str, ofxFilikaImageButtonPivot _alignment = CENTER) {
 		textStr = _str;
+
+		if (_alignment == CENTER) {
+			textPos.x = -textFont->getStringBoundingBox(_str, 0, 0).getWidth()*0.5;
+			textPos.y = textFont->getStringBoundingBox(_str, 0, 0).getHeight()*0.5;
+		}
+	}
+
+	void setOverlayTextPosition(glm::vec2 _textPos) {
+		textPos = _textPos;
 	}
 
 	void setTouchEnable(bool _val) {
@@ -196,7 +207,7 @@ public:
 	////////////////////////////////////////////////
 	// SETUP
 	////////////////////////////////////////////////
-	void setup(string _imgPath, int _size, int _id, int _bgMode = -1, ofVec2f _bgSize = ofVec2f(-1, -1), ofColor _mainColor = ofColor(0), bool _isAnimatable = true) {
+	void setup(string _imgPath, int _size, int _id, ofxFilikaImageButtonBgMode _bgMode = IMAGE, ofVec2f _bgSize = ofVec2f(-1, -1), ofColor _mainColor = ofColor(0), bool _isAnimatable = true) {
 
 		ofSetCircleResolution(64);
 
@@ -209,7 +220,7 @@ public:
 		isMouseEnabled = true;
 		isTouchEnabled = false;
 		isEnabledInteraction = true;
-
+		bgMode = _bgMode;
 		mainColor = _mainColor;
 		isAnimatable = _isAnimatable;
 		size = _size;
@@ -232,14 +243,24 @@ public:
 		bgMode = _bgMode;
 
 
-		imge.load(imgPath);
-
-		if (_size == -1) {
-			_w = imge.getWidth();
-			_h = imge.getHeight();
+		if (bgMode != IMAGE) {
+			_w = bgSize.x;
+			_h = bgSize.y;
 		}
 
-		if (size != -1)
+		if (imgPath != "") {
+			imge.load(imgPath);
+		}
+			
+		if (_size == -1) {
+			if (imgPath != "")
+			{
+				_w = imge.getWidth();
+				_h = imge.getHeight();
+			}
+		}
+
+		if (size != -1 && imgPath != "")
 		{
 			float aspect = imge.getWidth() / imge.getHeight();
 			float gap = 0.75;
@@ -258,6 +279,7 @@ public:
 			}
 		}
 
+
 		setPivot("center");
 		pivot = ofxFilikaImageButtonPivot::CENTER;
 	}
@@ -271,7 +293,7 @@ public:
 		ypos = _y + pivotPoint.y;
 
 		ofPushMatrix();
-
+		ofPushStyle();
 		ofTranslate(xpos, ypos); // Move container to specified position
 
 		if (isAnimatable) // Set container animatable or not animatable : Default: true
@@ -299,22 +321,26 @@ public:
 			ofPopMatrix();
 		}
 
-		ofSetColor(255, 255); // Add passive mode image
-		if (!isPassiveMode)
-			imge.draw(-pivotPoint.x, -pivotPoint.y);
-		else
-			imgePassive.draw(-pivotPoint.x, -pivotPoint.y);
-		if (isSelected) {
-			ofDrawCircle(0, strokeSize - 10, 3);
-		}
+		if (bgMode == ofxFilikaImageButtonBgMode::IMAGE)
+		{
+			ofSetColor(255, 255); // Add passive mode image
+			if (!isPassiveMode)
+				imge.draw(-pivotPoint.x, -pivotPoint.y);
+			else
+				imgePassive.draw(-pivotPoint.x, -pivotPoint.y);
 
+			if (isSelected) {
+				ofDrawCircle(0, strokeSize - 10, 3);
+			}
+		}
+		
 		if (textStr != "") {
 			ofPushStyle();
 			ofSetColor(textColor);
 			textFont->drawString(textStr, textPos.x, textPos.y);
 			ofPopStyle();
 		}
-
+		ofPopStyle();
 		ofPopMatrix();
 	}
 
