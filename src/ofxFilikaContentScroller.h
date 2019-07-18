@@ -18,11 +18,12 @@ private:
     
     ofRectangle scrollBarRect;
     ofRectangle scrollerRect;
+
 	ofxFilikaDraggableButton scrollerBtn;
     
     bool isScrollBarVisible;
     
-	int saveX, saveY;
+	int saveX, saveY, touchYScrollerPos;
     int sbW;
     int sbH;
     
@@ -97,42 +98,42 @@ public:
 	void moveMouseContentPressed(ofMouseEventArgs & e) {
 		if (e.x > this->x && e.x < this->x + this->getWidth() && e.y > this->y && e.y < this->y + this->getHeight()) {
 			//saveX = e.x - scrollerBtn.getPos().x;
-			ofLog() << "mn oluyor";
-			saveY = e.y;
+			saveY = ofMap(e.y, scrollBarRect.y, scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y) - scrollerRect.y;
 		}
 	}
 
 	void moveMouseContent(ofMouseEventArgs & e) {
 		//
-		if (e.x > this->x && e.x < this->x + this->getWidth() && e.y > this->y && e.y < this->y + this->getHeight()) {
-			ofLog() << "TOUCH e.x: " << e.y << " e.y:" << e.y - saveY;
-			
-			//moveAmty = scrollBarRect.y + ofMap(e.y, scrollBarRect.y, scrollBarRect.getHeight(), scrollBarRect.y, scrollBarRect.y + content->getHeight() - scrollBarRect.height)*1;
-
-			/*contentFbo.begin();
-			ofClear(0, 0);
-			content->draw(0, e.y - saveY);
-			contentFbo.end();*/
-			moveContent(ofVec2f(0, e.y ),1);
+		if (e.x > this->x && e.x < this->x + this->getWidth() && e.y > this->y && e.y < this->y + this->getHeight()) {			
+		
+			moveContent(ofVec2f(0, ofMap(e.y, scrollBarRect.y, scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y) - saveY), "touch");
 		}
 			
 	}
 #endif	
 
-	void moveContent(ofVec2f _p, int _dir = -1) {
+	void moveContent(ofVec2f _p, string _dir = "natural") {
 
-		
+		int maxYVal = scrollBarRect.y + scrollBarRect.height - scrollerBtn.getHeight();
+
+		// Moves scroll button
+		//scrollerRect.y = _p.y;
 		scrollerRect.y = _p.y;
+
+
 		if (_p.y < scrollBarRect.y) {
 			scrollerRect.y = scrollBarRect.y;
 		}
 
-		int maxYVal = scrollBarRect.y + scrollBarRect.height - scrollerBtn.getHeight();
+		
 		if (_p.y > maxYVal) {
 			scrollerRect.y = maxYVal;
 		}
 
-		moveAmty = scrollBarRect.y + ofMap(scrollerRect.y, scrollBarRect.y, maxYVal, scrollBarRect.y, scrollBarRect.y + content->getHeight() - scrollBarRect.height)*_dir;
+		if(_dir == "natural")
+			moveAmty = scrollBarRect.y + ofMap(scrollerRect.y, scrollBarRect.y, maxYVal, scrollBarRect.y, scrollBarRect.y + content->getHeight() - scrollBarRect.height)*-1;
+		else
+			moveAmty = scrollBarRect.y + ofMap(scrollerRect.y, scrollBarRect.y + scrollBarRect.height, scrollBarRect.y, scrollBarRect.y + content->getHeight(), scrollBarRect.y)*-1;
 
 		contentFbo.begin();
 		ofClear(0, 0);
@@ -158,7 +159,7 @@ public:
 				// Scroller
 				//ofSetColor(scColor);
 				//ofDrawRectRounded(scrollerRect, sbRoundness, sbRoundness, sbRoundness, sbRoundness);
-				scrollerBtn.draw(scrollerRect.x,scrollerRect.y);
+				scrollerBtn.draw(scrollerRect.x, scrollerRect.y);
 				ofPopStyle();
 			}
 		}
