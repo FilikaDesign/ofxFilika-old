@@ -49,9 +49,9 @@ public:
 		ofAddListener(ofEvents().mousePressed, this, &ofxFilikaContentScroller::moveMouseContentPressed);
 #endif	
 		if (isScrollBarVisible)
-			ofRemoveListener(scrollerBtn.BUTTON_DRAGGING_VERTICAL, this, &ofxFilikaContentScroller::isDraggingHandler);
+			ofRemoveListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
 
-		ofAddListener(scrollerBtn.BUTTON_DRAGGING_VERTICAL, this, &ofxFilikaContentScroller::isDraggingHandler);
+		ofAddListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
 
 		isScrollBarVisible = false;
 	}
@@ -65,7 +65,7 @@ public:
 		ofRemoveListener(ofEvents().mouseDragged, this, &ofxFilikaContentScroller::moveMouseContent);
 #endif	
 		if (isScrollBarVisible)
-			ofRemoveListener(scrollerBtn.BUTTON_DRAGGING_VERTICAL, this, &ofxFilikaContentScroller::isDraggingHandler);
+			ofRemoveListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
 
 		isScrollBarVisible = false;
 		
@@ -202,13 +202,13 @@ public:
 			scrollerBtn.setInteractionArea(ofVec2f(scrollerRect.width + 40, scrollerRect.height));
 
 			if(isScrollBarVisible)
-				ofRemoveListener(scrollerBtn.BUTTON_DRAGGING_VERTICAL, this, &ofxFilikaContentScroller::isDraggingHandler);
+				ofRemoveListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
 
 
 			isScrollBarVisible = true;
 
 			
-			ofAddListener(scrollerBtn.BUTTON_DRAGGING_VERTICAL, this, &ofxFilikaContentScroller::isDraggingHandler);
+			ofAddListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
 		}
 		else {
 			isScrollBarVisible = false;

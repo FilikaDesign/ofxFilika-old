@@ -85,7 +85,7 @@ public:
 		textPos = _textPos;
 	}
 
-	void setOverlayText(string _str, ofxFilikaImageButtonPivot _alignment = CENTER) {
+	void setOverlayText(string _str, ofxFilikaImageButtonPivot _alignment = TOP_LEFT) {
 		textStr = _str;
 
 		if (_alignment == CENTER) {

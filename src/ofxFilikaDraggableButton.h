@@ -18,7 +18,7 @@ class ofxFilikaDraggableButton {
 private:
     int saveX, saveY;
     int xpos, ypos, w, hitx, hity, bId, h;
-    float scaleFac;
+    float scaleFac, _scaleFacVal;
     bool isAnimatable, delay;
     int _w, _h;
     int _bgOpacity;
@@ -58,7 +58,7 @@ public:
 
 	ofEvent<int> BUTTON_TOUCH_DOWN;
 	ofEvent<int> BUTTON_TOUCH_UP;
-    ofEvent<ofVec2f> BUTTON_DRAGGING_VERTICAL;
+    ofEvent<ofVec2f> BUTTON_DRAGGING;
 
 	ofColor mainColor;
     ofColor _OVER_COLOR;
@@ -89,6 +89,9 @@ public:
 		}
 			
 	}*/
+	void setTouchDownScaleFac(float _s) {
+		_scaleFacVal = _s;
+	}
 
 	void setRoundness(int _v) {
 		sbRoundness = _v;
@@ -98,6 +101,11 @@ public:
         isDraggingV = _v;
         //isDraggingH = _h;
     }
+
+	void setDraggingHorizontal(bool _h) {
+		isDraggingH = _h;
+	}
+
     void setButtonMode(ofxFilikaButtonMode _v) {
         buttonMode = _v;
     }
@@ -234,6 +242,7 @@ public:
         bId = _id;
         targetScale = 1;
         scaleFac = 1;
+		_scaleFacVal = 0.8;
         
         btnAnimT = 0.125;
         bgMode = ofxFilikaImageButtonBgMode::NONE;
@@ -359,13 +368,16 @@ public:
 
 		ofSetColor(255, 255); // Add passive mode image
         if(buttonMode == ofxFilikaButtonMode::IMAGE) {
-            if (!isPassiveMode)
-                imge.draw(-imge.getWidth() * 0.5, -imge.getHeight() * 0.5);
-            else
+            if (!isPassiveMode) {
+				if (pivot == "center") {
+					imge.draw(-imge.getWidth() * 0.5, -imge.getHeight() * 0.5);
+				}
+				else if (pivot == "tl") {
+					imge.draw(0, 0);
+				}
+			}else{
                 imgePassive.draw(-imgePassive.getWidth() * 0.5, -imgePassive.getHeight() * 0.5);
-            if (isSelected) {
-                ofDrawCircle(0, strokeSize - 10, 3);
-            }
+			}
         }else if(buttonMode == ofxFilikaButtonMode::SHAPE_ROUNRECT) {
             ofSetColor(mainColor);
             ofDrawRectRounded(ofRectangle(0,0,_w, _h), sbRoundness, sbRoundness, sbRoundness, sbRoundness);
@@ -451,9 +463,13 @@ public:
         if(isDown) {
             if(isDraggingV) {
                 ypos = _y - saveY;
-                ofVec2f p = ofVec2f(xpos, ypos);
-                ofNotifyEvent(BUTTON_DRAGGING_VERTICAL, p);
             }
+
+			if (isDraggingH) {
+				xpos = _x - saveX;
+			}
+			ofVec2f p = ofVec2f(xpos, ypos);
+			ofNotifyEvent(BUTTON_DRAGGING, p);
         }
     }
     ////////////////////////////////////////////////
@@ -469,7 +485,7 @@ public:
             
             
             //if (isAnimatable)
-            targetScale = 0.8;
+            targetScale = _scaleFacVal;
             isDown = true;
             ofNotifyEvent(BUTTON_TOUCH_DOWN, bId);
             
@@ -488,7 +504,7 @@ public:
 			
 			if (isDown)
 			{
-				targetScale = 1.0;
+				targetScale = _scaleFacVal;
 				ofNotifyEvent(BUTTON_TOUCH_UP, bId);
 				isDown = false;
                 
@@ -504,7 +520,7 @@ public:
 		
 		if (isDown)
 		{
-			targetScale = 1.0;
+			targetScale = _scaleFacVal;
 			ofNotifyEvent(BUTTON_TOUCH_UP, bId);
 			isDown = false;
 			//cout << "outside " << isDown << endl;
