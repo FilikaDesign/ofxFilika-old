@@ -105,6 +105,14 @@ public:
 	}
 
 	/* STRING OPERATIONS */
+	/* Save ofxFilikaUtils.h file as unicode-(without signature) */
+	string toUpperUTF8(string _txt) {
+		string convert_i_to_cap = findAndReplaceAll(_txt, "i", "İ");
+		string convertToCapitalsPre = findAndReplaceAll(convert_i_to_cap, "ı", "i");
+		
+		return ofToUpper(convertToCapitalsPre);
+	}
+
 	string findAndReplaceAll(std::string & data, std::string toSearch, std::string replaceStr)
 	{
 		// Get the first occurrence
@@ -158,6 +166,10 @@ public:
 	}
 
 	/* First Level */
+	string getPathValStr(string _path_xml_tag) {
+		return xml.find(_path_xml_tag)[0].getValue();
+	}
+
 	string getTagValStr(string _tag) {
 		return xml.find("//root").getFirst().getChild(_tag).getValue();
 	}

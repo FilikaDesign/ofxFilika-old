@@ -20,7 +20,12 @@ private:
     ofRectangle scrollerRect;
 
 	ofxFilikaDraggableButton scrollerBtn;
+	ofxFilikaDraggableButton btnScrollUp;
+	ofxFilikaDraggableButton btnScrollDown;
     
+	glm::vec2 btnScrollUpPos;
+	glm::vec2 btnScrollDownPos;
+
     bool isScrollBarVisible;
     
 	int saveX, saveY, touchYScrollerPos;
@@ -35,8 +40,10 @@ private:
 	int moveAmty;
     int sbGap;
     ofColor sbColor;
-    ofColor scColor;
+    ofColor scColor,scOverColor,scPressedColor;
     
+	bool isScrollNavEnable;
+
 	void isDraggingHandler(ofVec2f & _p) {
 		moveContent(_p);
 	}
@@ -106,35 +113,37 @@ public:
 		//
 		if (e.x > this->x && e.x < this->x + this->getWidth() && e.y > this->y && e.y < this->y + this->getHeight()) {			
 		
-			moveContent(ofVec2f(0, ofMap(e.y, scrollBarRect.y, scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y) - saveY), "touch");
+			moveContent(ofVec2f(0, ofMap(e.y, scrollBarRect.y, scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y) - saveY), "natural");
 		}
 			
 	}
 #endif	
 
-	void moveContent(ofVec2f _p, string _dir = "natural") {
+	void moveContent(ofVec2f _p, string _dir = "default") {
 
 		int maxYVal = scrollBarRect.y + scrollBarRect.height - scrollerBtn.getHeight();
 
 		// Moves scroll button
-		//scrollerRect.y = _p.y;
 		scrollerRect.y = _p.y;
 
 
+		// Stop if the content reaches to top border
 		if (_p.y < scrollBarRect.y) {
 			scrollerRect.y = scrollBarRect.y;
 		}
 
-		
+		// Stop, if the content reaches to end
 		if (_p.y > maxYVal) {
 			scrollerRect.y = maxYVal;
 		}
 
-		if(_dir == "natural")
+		// Change moving direction
+		if(_dir == "default")
 			moveAmty = scrollBarRect.y + ofMap(scrollerRect.y, scrollBarRect.y, maxYVal, scrollBarRect.y, scrollBarRect.y + content->getHeight() - scrollBarRect.height)*-1;
 		else
 			moveAmty = scrollBarRect.y + ofMap(scrollerRect.y, scrollBarRect.y + scrollBarRect.height, scrollBarRect.y, scrollBarRect.y + content->getHeight(), scrollBarRect.y)*-1;
 
+		// Update & slide the content fbo
 		contentFbo.begin();
 		ofClear(0, 0);
 		content->draw(0, moveAmty);
@@ -197,6 +206,9 @@ public:
 
 			// ofVec2f _size, int _id, ofColor _mainColor = ofColor(0), bool _isAnimatable = false
 			scrollerBtn.setup(ofVec2f(scrollerRect.width, scrollerRect.height), 0, scColor);
+			scrollerBtn.setColorReleased(scColor);
+			scrollerBtn.setColorPressed(scPressedColor);
+			scrollerBtn.setColorOver(scOverColor);
 			scrollerBtn.setPivot("tl");
 			scrollerBtn.setRoundness(sbRoundness);
 			scrollerBtn.setDraggingVertical(true);
@@ -255,9 +267,27 @@ public:
         sbColor = _v;
     }
     
-    void setScrollerColor(ofColor _v) {
-        scColor = _v;
+    void setScrollerColor(ofColor _idleColor, ofColor _pressedColor, ofColor _overColor) {
+        scColor			= _idleColor;
+		scPressedColor  = _pressedColor;
+		scOverColor		= _overColor;
     }
+
+	/* SCROLL NAVIGATION */
+	void setScrollNavEnable(bool _isEnable) {
+		isScrollNavEnable = _isEnable;
+	}
+
+	void setScrollNavigation(string _btnUpSrc, string _btnDownSrc, bool _enable = true) {
+		isScrollNavEnable = _enable;
+		btnScrollDown.setup(_btnDownSrc, 0);
+		btnScrollUp.setup(_btnUpSrc, 0);
+	}
+
+	void setScrollNavPos(glm::vec2 _upPos, glm::vec2 _downPos) {
+		btnScrollDownPos = _downPos;
+		btnScrollUpPos = _upPos;
+	}
 };
 
 #endif /* ofxFilikaContentScroller_h */

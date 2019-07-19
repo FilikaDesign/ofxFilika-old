@@ -11,14 +11,28 @@
 #include "ofMain.h"
 //#include "ofxTweenzor.h"
 
+typedef enum ofxFilikaBgMode {
+	BG_NONE,
+	BG_CUSTOM,
+	BG_RECTANGLE,
+	BG_ELLIPSE
+}ofxFilikaBgMode;
 
+typedef enum ofxFilikaButtonMode {
+	MODE_IMAGE,
+	MODE_SHAPE_ROUNRECT,
+	MODE_SHAPE_RECTANGLE,
+	MODE_SHAPE_ELLIPSE
+}ofxFilikaButtonMode;
 
 
 class ofxFilikaDraggableButton {
+	
+
 private:
     int saveX, saveY;
     int xpos, ypos, w, hitx, hity, bId, h;
-    float scaleFac, _scaleFacVal;
+    float scaleFac, _scaleMinVal, _scaleMaxVal, targetScale;
     bool isAnimatable, delay;
     int _w, _h;
     int _bgOpacity;
@@ -31,30 +45,16 @@ private:
     bool isDraggingV;
     bool isDraggingH;
     
-    // Tween Lib
-    float x1, x2, targetScale;
+    // Tween Lib;
     float btnAnimT;
-    int bgMode;
-    int buttonMode;
+	ofxFilikaBgMode bgMode;
+	ofxFilikaButtonMode buttonMode;
     ofVec2f bgSize;
     ofVec2f touchStartPos;
 	ofVec2f interactionArea;
     int sbRoundness;
 public:
-
-	enum ofxFilikaImageButtonBgMode {
-		NONE,
-		CUSTOM,
-		RECTANGLE,
-		ELLIPSE
-	};
-
-	enum ofxFilikaButtonMode {
-		IMAGE,
-		SHAPE_ROUNRECT,
-		SHAPE_RECTANGLE,
-		SHAPE_ELLIPSE
-	};
+	
 
 	ofEvent<int> BUTTON_TOUCH_DOWN;
 	ofEvent<int> BUTTON_TOUCH_UP;
@@ -70,7 +70,6 @@ public:
 	bool isMouseEnabled;
 	bool isTouchEnabled;
     
-	int size;
 	int strokeSize;
     
 	ofImage imge;
@@ -89,8 +88,9 @@ public:
 		}
 			
 	}*/
-	void setTouchDownScaleFac(float _s) {
-		_scaleFacVal = _s;
+	void setTouchDownScaleFac(float _sMin, float _sMax) {
+		_scaleMinVal = _sMin;
+		_scaleMaxVal = _sMax;
 	}
 
 	void setRoundness(int _v) {
@@ -143,7 +143,7 @@ public:
 		ypos = _y;
 	}
 
-	void setBackgroundShape(int _mode = 0) {
+	void setBackgroundShape(ofxFilikaBgMode _mode) {
 		bgMode = _mode;
 	}
 
@@ -154,6 +154,18 @@ public:
 
 	void setPassive(bool _val) {
 		isPassiveMode = _val;
+	}
+
+	void setColorReleased(ofColor _releasedColor) {
+		_OUT_COLOR = _releasedColor;
+	}
+
+	void setColorOver(ofColor _overColor) {
+		_OVER_COLOR = _overColor;
+	}
+
+	void setColorPressed(ofColor _pressedColor) {
+		_PRESS_COLOR = _pressedColor;
 	}
 
 	void setPivot(string _pivot) {
@@ -234,7 +246,7 @@ public:
         isMouseEnabled = true;
         isTouchEnabled = false;
         isEnabledInteraction = true;
-        buttonMode = ofxFilikaButtonMode::SHAPE_ROUNRECT;
+        buttonMode = ofxFilikaButtonMode::MODE_SHAPE_ROUNRECT;
         
         mainColor = _mainColor;
         isAnimatable = _isAnimatable;
@@ -242,10 +254,11 @@ public:
         bId = _id;
         targetScale = 1;
         scaleFac = 1;
-		_scaleFacVal = 0.8;
+		_scaleMinVal = 0.8;
+		_scaleMaxVal = 1;
         
         btnAnimT = 0.125;
-        bgMode = ofxFilikaImageButtonBgMode::NONE;
+        bgMode = ofxFilikaBgMode::BG_NONE;
         
         
         _w = _size.x;
@@ -259,7 +272,7 @@ public:
 	////////////////////////////////////////////////
 	// SETUP
 	////////////////////////////////////////////////
-	void setup(string _imgPath, int _size, int _id, int _bgMode = -1, ofVec2f _bgSize = ofVec2f(-1, -1), ofColor _mainColor = ofColor(0), bool _isAnimatable = true) {
+	void setup(string _imgPath, int _id, ofVec2f _bgSize = ofVec2f(-1, -1), ofColor _mainColor = ofColor(0), bool _isAnimatable = true) {
 
 		ofSetCircleResolution(64);
 
@@ -272,41 +285,39 @@ public:
 		isMouseEnabled = true;
 		isTouchEnabled = false;
 		isEnabledInteraction = true;
-        buttonMode = ofxFilikaButtonMode::IMAGE;
+        buttonMode = ofxFilikaButtonMode::MODE_IMAGE;
 
 		mainColor = _mainColor;
 		isAnimatable = _isAnimatable;
-		size = _size;
+
 		bgSize = _bgSize;
-		strokeSize = _size + 10;
+		
 		bId = _id;
-		x2 = size * 2.0;
 		targetScale = 1;
 		scaleFac = 1;
+		_scaleMinVal = 0.8;
+		_scaleMaxVal = 1;
 
-		if (_size == -1) {
-			_w = bgSize.x;
-			_h = bgSize.y;
-		}
-
-		scaleFac = 1;
 		imgPath = _imgPath;
 
 		btnAnimT = 0.125;
-		bgMode = _bgMode;
+		bgMode = ofxFilikaBgMode::BG_NONE;
 
 
 		if(imgPath != "")
 			imge.load(imgPath);
 
-		if (_size == -1) {
+		if (bgSize.x > imge.getWidth()) {
+			_w = bgSize.x;
+			_h = bgSize.y;
+		}
+		else {
 			_w = imge.getWidth();
 			_h = imge.getHeight();
 		}
 
-		if (size != -1)
-		{
-			float aspect = imge.getWidth() / imge.getHeight();
+		
+			/*float aspect = imge.getWidth() / imge.getHeight();
 			float gap = 0.75;
 
 			if (imge.getWidth() == max(imge.getWidth(), imge.getHeight())) {
@@ -320,11 +331,13 @@ public:
 				imge.resize((size * aspect) * gap, size * gap);
 				_w = (size * aspect) * gap;
 				_h = size * gap;
-			}
-		}
+			*/
+		
 
 		interactionArea.x = _w;
 		interactionArea.y = _h;
+
+		setPivot("center");
 	}
 
 	////////////////////////////////////////////////
@@ -346,20 +359,20 @@ public:
 
 		ofScale(scaleFac, scaleFac); // Scale Value of the container
 
-		if (bgMode == ofxFilikaImageButtonBgMode::CUSTOM) { // Set background color and shape ROUNDED RECTANGLE
+		if (bgMode == ofxFilikaBgMode::BG_CUSTOM) { // Set background color and shape ROUNDED RECTANGLE
 			ofPushMatrix();
 			ofRotate(45);
 			ofSetColor(mainColor);
-			ofDrawRectRounded(-size*0.5, -size*0.5, size, size, 30);
+			ofDrawRectRounded(-bgSize.x*0.5, -bgSize.y*0.5, bgSize.x, bgSize.y, 30);
 			ofPopMatrix();
 		}
-		else if (bgMode == ofxFilikaImageButtonBgMode::RECTANGLE) { // Set background color and shape RECTANGLE
+		else if (bgMode == ofxFilikaBgMode::BG_RECTANGLE) { // Set background color and shape RECTANGLE
 			ofPushMatrix();
 			ofSetColor(mainColor);
 			ofDrawRectangle(-bgSize.x*0.5, -bgSize.y*0.5, bgSize.x, bgSize.y);
 			ofPopMatrix();
 		}
-		else if (bgMode == ofxFilikaImageButtonBgMode::ELLIPSE) { // Set background color and shape ELLIPSE
+		else if (bgMode == ofxFilikaBgMode::BG_ELLIPSE) { // Set background color and shape ELLIPSE
 			ofPushMatrix();
 			ofSetColor(mainColor);
 			ofDrawEllipse(0, 0, bgSize.x, bgSize.y);
@@ -367,7 +380,7 @@ public:
 		}
 
 		ofSetColor(255, 255); // Add passive mode image
-        if(buttonMode == ofxFilikaButtonMode::IMAGE) {
+        if(buttonMode == ofxFilikaButtonMode::MODE_IMAGE) {
             if (!isPassiveMode) {
 				if (pivot == "center") {
 					imge.draw(-imge.getWidth() * 0.5, -imge.getHeight() * 0.5);
@@ -378,7 +391,7 @@ public:
 			}else{
                 imgePassive.draw(-imgePassive.getWidth() * 0.5, -imgePassive.getHeight() * 0.5);
 			}
-        }else if(buttonMode == ofxFilikaButtonMode::SHAPE_ROUNRECT) {
+        }else if(buttonMode == ofxFilikaButtonMode::MODE_SHAPE_ROUNRECT) {
             ofSetColor(mainColor);
             ofDrawRectRounded(ofRectangle(0,0,_w, _h), sbRoundness, sbRoundness, sbRoundness, sbRoundness);
         }
@@ -485,7 +498,7 @@ public:
             
             
             //if (isAnimatable)
-            targetScale = _scaleFacVal;
+            targetScale = _scaleMinVal;
             isDown = true;
             ofNotifyEvent(BUTTON_TOUCH_DOWN, bId);
             
@@ -504,7 +517,7 @@ public:
 			
 			if (isDown)
 			{
-				targetScale = _scaleFacVal;
+				targetScale = _scaleMaxVal;
 				ofNotifyEvent(BUTTON_TOUCH_UP, bId);
 				isDown = false;
                 
@@ -520,7 +533,7 @@ public:
 		
 		if (isDown)
 		{
-			targetScale = _scaleFacVal;
+			targetScale = _scaleMaxVal;
 			ofNotifyEvent(BUTTON_TOUCH_UP, bId);
 			isDown = false;
 			//cout << "outside " << isDown << endl;
