@@ -5,9 +5,21 @@
 
 #include "ofMain.h"
 #include "ofEvents.h"
-#include "ofxFilikaMultiTouchEvents.h"
+
+static class ofxFilikaZoomEvent {
+public:
+	float distance;
+	glm::vec2 center;
+	float scale;
+};
 
 
+static class ofxFilikaRotationEvent {
+public:
+	glm::vec2 center;
+	float rotation;
+
+};
 
 //touch
 static float _tempDist;
@@ -19,12 +31,12 @@ static WNDPROC prevWndProc;
 /* Get window pointer */
 
 // MULTI TOUCH EVENT ARGS
-ofEvent<ofxFilikaZoomEvent> OFX_FILIKA_ZOOM_EVENT;
-ofEvent<ofxFilikaRotationEvent> OFX_FILIKA_ROTATION_EVENT;
-ofEvent<void> OFX_FILIKA_GESTURE_BEGIN_EVENT;
-ofEvent<void> OFX_FILIKA_GESTURE_END_EVENT;
+static ofEvent<ofxFilikaZoomEvent> OFX_FILIKA_ZOOM_EVENT;
+static ofEvent<ofxFilikaRotationEvent> OFX_FILIKA_ROTATION_EVENT;
+static ofEvent<void> OFX_FILIKA_GESTURE_BEGIN_EVENT;
+static ofEvent<void> OFX_FILIKA_GESTURE_END_EVENT;
 
-double getPinchScale(float _dist)
+static double getPinchScale(float _dist)
 {
 	_curDist = _dist;
 
@@ -41,7 +53,7 @@ double getPinchScale(float _dist)
 	return _scale;
 }
 
-double rotationToRad(UINT arg)
+static double rotationToRad(UINT arg)
 {
 	return ((((double)(arg) / 65535.0) * 4.0 * 3.14159265) - 2.0 * 3.14159265);
 }
@@ -168,7 +180,7 @@ static bool handlePointerEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		ofLogError() << "pointer id " << touch.id << " not confident: flags 0x" << hex << pointer->pointerFlags;
 	}
 	*/
-	
+
 	if (pointer->pointerFlags & POINTER_FLAG_DOWN) {
 		touch.type = ofTouchEventArgs::Type::down;
 		ofNotifyEvent(ofEvents().touchDown, touch);
@@ -186,7 +198,7 @@ static bool handlePointerEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 
 
-LRESULT DecodeGesture(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+static LRESULT DecodeGesture(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
 	//UnregisterTouchWindow(hWnd);
 
@@ -234,7 +246,7 @@ LRESULT DecodeGesture(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 			//cout << "y: " << gi.ptsLocation.y - ofGetWindowPositionY() << endl;
 
 			//cout << "ZOOM x:y " << gi.ptsLocation.x << ":" << gi.ptsLocation.y << endl;
-			
+
 			zoomGesture.center = glm::vec2(gi.ptsLocation.x - ofGetWindowPositionX(), gi.ptsLocation.y - ofGetWindowPositionY());
 			zoomGesture.distance = gi.ullArguments;
 			zoomGesture.scale = getPinchScale(gi.ullArguments);
@@ -292,7 +304,7 @@ LRESULT DecodeGesture(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
 
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int wmId, wmEvent;
 	PAINTSTRUCT ps;
@@ -308,10 +320,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 /* Window callback function */
-LRESULT APIENTRY pointerWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+static LRESULT APIENTRY pointerWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 	//gesture recognition
-	DecodeGesture(hwnd, uMsg, wParam, lParam);
+	//DecodeGesture(hwnd, uMsg, wParam, lParam);
 
 	int wmId, wmEvent;
 	PAINTSTRUCT ps;
@@ -328,12 +340,15 @@ LRESULT APIENTRY pointerWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		if (handlePointerEvent(uMsg, wParam, lParam))
 			return 0;
 		break; // fail, call CallWindowProc
+	case WM_DESTROY:
+		DestroyWindow(hwnd);
+		exit(0);
 	}
 	// Chain to the next wndproc
 	return CallWindowProc(prevWndProc, hwnd, uMsg, wParam, lParam);
 }
 
-void ofxFilikaMultiTouchSetup() {
+static void ofxFilikaMultiTouchSetup() {
 
 
 	HWND hwnd = getOfxWindow();
@@ -361,7 +376,7 @@ void ofxFilikaMultiTouchSetup() {
 
 	UINT uiGcs = 5;
 	BOOL bResult = SetGestureConfig(hwnd, 0, uiGcs, gc, sizeof(GESTURECONFIG));
-	
+
 	if (!bResult) {
 		DWORD err = GetLastError();
 	}
