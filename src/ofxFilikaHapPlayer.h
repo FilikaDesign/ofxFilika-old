@@ -24,8 +24,9 @@ class ofxFilikaHapPlayer
 		int vidY;
 
 		// Dir listing
-		ofDirectory dir;
+		ofDirectory dir, dirSound;
 		vector<ofxHapPlayer *> player;
+		vector<ofSoundPlayer> sounds;
 		int currentVid;
 
 		bool autoPlay;
@@ -63,14 +64,17 @@ class ofxFilikaHapPlayer
 
 		void setPauseVideo() {
 			player[currentVid]->setPaused(true);
+			sounds[currentVid].setPaused(true);
 		}
 
 		void setPosition(float _p) {
 			player[currentVid]->setPosition(_p);
+			sounds[currentVid].setPosition(_p);
 		}
 
 		void setPlayVideo() {
 			player[currentVid]->play();
+			sounds[currentVid].play();
 		}
 
 		void setup(string _settings, bool _autoPlay = false) {
@@ -116,6 +120,7 @@ class ofxFilikaHapPlayer
 			dir.allowExt("avi");
 			dir.allowExt("mov");
 
+
 			if (dir.doesDirectoryExist(vidFolder)) {
 				cout << "Playlist loaded succesfully" << endl;
 
@@ -141,13 +146,40 @@ class ofxFilikaHapPlayer
 			else {
 				cout << "Check playlist folder name..." << endl;
 			}
+
+			if (dirSound.doesDirectoryExist(vidFolder)) {
+				cout << "sounds loaded succesfully" << endl;
+
+				dirSound.listDir("sounds");
+				dirSound.sort(); // in linux the file system doesn't return file lists ordered in alphabetical order
+
+				sounds.resize(dirSound.size());
+
+				// you can now iterate through the files and load them into the ofImage vector
+				for (int i = 0; i < (int)dirSound.size(); i++) {
+					sounds[i].load(dirSound.getPath(i));
+					sounds[i].setLoop(vidIsLooping);
+					sounds[i].setVolume(vidVolume);
+					sounds[i].setSpeed(vidSpeed);
+				}
+
+				if (autoPlay)
+					sounds[currentVid].play();
+			}
+			else {
+				cout << "Check sounds folder name..." << endl;
+			}
 		}
 
 		void draw() {
-			if (player[currentVid]->isLoaded())
+			ofSoundUpdate();
+
+			if (player[currentVid]->isLoaded() && sounds[currentVid].isLoaded())
 			{
 				if(player[currentVid]->isPlaying())
 					player[currentVid]->draw(vidX,vidY,vidW,vidH);
+
+				///if (sounds[currentVid].isPlaying())
 
 				/*if (player[currentVid]->getIsMovieDone()) {
 					if (player[currentVid]->getLoopState() == OF_LOOP_NORMAL)
@@ -163,11 +195,14 @@ class ofxFilikaHapPlayer
 				currentVid++;
 				currentVid %= dir.size();
 				player[currentVid]->play();
+				sounds[currentVid].play();
 			}
 		}
 
 		void loadVideoById(int _id) {
 			currentVid = _id;
+			sounds[currentVid].stop();
+			sounds[currentVid].play();
 			player[currentVid]->stop();
 			player[currentVid]->play();
 		}
