@@ -11,6 +11,8 @@
 #include "ofMain.h"
 //#include "ofxTweenzor.h"
 
+
+
 typedef enum ofxFilikaBgMode {
 	BG_NONE,
 	BG_CUSTOM,
@@ -239,12 +241,15 @@ public:
         
         isPassiveMode = false;
         sbRoundness   = 5;
-        // register events for interaction
-        ofRegisterMouseEvents(this);
-        //ofRegisterTouchEvents(this);
-        
-        isMouseEnabled = true;
-        isTouchEnabled = false;
+       
+#ifdef TOUCH_ENABLE
+        ofRegisterTouchEvents(this);
+		isTouchEnabled = true;
+#else
+		// register events for interaction
+		ofRegisterMouseEvents(this);
+		isMouseEnabled = true;
+#endif
         isEnabledInteraction = true;
         buttonMode = ofxFilikaButtonMode::MODE_SHAPE_ROUNRECT;
         
@@ -278,12 +283,14 @@ public:
 
 		isPassiveMode = false;
 
+#ifdef TOUCH_ENABLE
+		ofRegisterTouchEvents(this);
+		isTouchEnabled = true;
+#else
 		// register events for interaction
 		ofRegisterMouseEvents(this);
-		//ofRegisterTouchEvents(this);
-
 		isMouseEnabled = true;
-		isTouchEnabled = false;
+#endif
 		isEnabledInteraction = true;
         buttonMode = ofxFilikaButtonMode::MODE_IMAGE;
 
@@ -414,7 +421,8 @@ public:
 
 	//--------------------------------------------------------------
 	void touchMoved(ofTouchEventArgs & touch) {
-
+		if (isDraggingH || isDraggingV)
+			hitAndDrag(touch.x, touch.y);
 	}
 
 	//--------------------------------------------------------------
@@ -429,7 +437,7 @@ public:
 
 	//--------------------------------------------------------------
 	void touchCancelled(ofTouchEventArgs & touch) {
-		//hitReleasedOutside();
+		hitReleasedOutside();
 	}
 
 
