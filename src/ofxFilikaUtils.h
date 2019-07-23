@@ -130,6 +130,54 @@ public:
 		return data;
 	}
 
+	/* RETURN FILE EXTENSION */
+	string getFileName(string _str, bool _trimExt = false) {
+		string name = "";
+		int slashPos = _str.rfind('/');
+
+		if (slashPos != string::npos) {
+			name = _str.substr(slashPos + 1);
+
+			if (_trimExt)
+				name = getFilePathTrimExtension(name);
+		}
+
+		return name;
+	}
+
+	string getFileFolderPath(string _str) {
+		string name = "";
+		int slashPos = _str.rfind('/');
+
+		if (slashPos != string::npos) {
+			name = _str.substr(0, slashPos);
+		}
+
+		return name;
+	}
+
+	string getFileExtension(string _str) {
+		string ext = "";
+		int extPos = _str.rfind('.');
+
+		if (extPos != string::npos) {
+			ext = _str.substr(extPos + 1);
+		}
+
+		return ext;
+	}
+
+	string getFilePathTrimExtension(string _str) {
+		string ext = "";
+		int extPos = _str.rfind('.');
+
+		if (extPos != string::npos) {
+			ext = _str.substr(0, extPos);
+		}
+
+		return ext;
+	}
+
 	/* XML Operations */
 	void loadXml(string _src) {
 		xmlFile = _src;
@@ -139,6 +187,19 @@ public:
 	// should be called xml.find("//root/RESPONSES/RESPONSE").size();
 	int getNumTags(string _tagPath) {
 		return xml.find(_tagPath).size();
+	}
+
+	vector<string> getTagStringListRecursive(string _tagPath, int _id, string _tag1) {
+		vector<string> list;
+		int size = xml.find(_tagPath)[_id].find(_tag1).size();
+		list.resize(size);
+
+		for (int i = 0; i < list.size(); i++)
+		{
+			list[i] = xml.find(_tagPath)[_id].find(_tag1)[i].getValue();
+		}
+
+		return list;
 	}
 
 	vector<string> getTagStringList(string _tagPath) {
