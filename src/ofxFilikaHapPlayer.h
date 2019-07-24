@@ -14,6 +14,7 @@ class ofxFilikaHapPlayer
 		float vidSpeed;
 		float vidVolume;
 		bool vidIsLooping;
+		bool loadSound;
 
 		string vidDispModeW;
 		string vidDispModeH;
@@ -64,21 +65,25 @@ class ofxFilikaHapPlayer
 
 		void setPauseVideo() {
 			player[currentVid]->setPaused(true);
-			sounds[currentVid].setPaused(true);
+			if(loadSound)
+				sounds[currentVid].setPaused(true);
 		}
 
 		void setPosition(float _p) {
 			player[currentVid]->setPosition(_p);
-			sounds[currentVid].setPosition(_p);
+			if (loadSound)
+				sounds[currentVid].setPosition(_p);
 		}
 
 		void setPlayVideo() {
 			player[currentVid]->play();
-			sounds[currentVid].play();
+			if (loadSound)
+				sounds[currentVid].play();
 		}
 
-		void setup(string _settings, bool _autoPlay = false) {
+		void setup(string _settings, bool _autoPlay = false, bool _loadSound = false) {
 			
+			loadSound = _loadSound;
 			autoPlay = _autoPlay;
 			// Parse SETTINGS XML
 			xml.load(_settings);
@@ -147,47 +152,62 @@ class ofxFilikaHapPlayer
 				cout << "Check playlist folder name..." << endl;
 			}
 
-			if (dirSound.doesDirectoryExist(vidFolder)) {
-				cout << "sounds loaded succesfully" << endl;
+			if (loadSound)
+			{
+				if (dirSound.doesDirectoryExist(vidFolder)) {
+					cout << "sounds loaded succesfully" << endl;
 
-				dirSound.listDir("sounds");
-				dirSound.sort(); // in linux the file system doesn't return file lists ordered in alphabetical order
+					dirSound.listDir("sounds");
+					dirSound.sort(); // in linux the file system doesn't return file lists ordered in alphabetical order
 
-				sounds.resize(dirSound.size());
+					sounds.resize(dirSound.size());
 
-				// you can now iterate through the files and load them into the ofImage vector
-				for (int i = 0; i < (int)dirSound.size(); i++) {
-					sounds[i].load(dirSound.getPath(i));
-					sounds[i].setLoop(vidIsLooping);
-					sounds[i].setVolume(vidVolume);
-					sounds[i].setSpeed(vidSpeed);
+					// you can now iterate through the files and load them into the ofImage vector
+					for (int i = 0; i < (int)dirSound.size(); i++) {
+						sounds[i].load(dirSound.getPath(i));
+						sounds[i].setLoop(vidIsLooping);
+						sounds[i].setVolume(vidVolume);
+						sounds[i].setSpeed(vidSpeed);
+					}
+
+					if (autoPlay)
+						sounds[currentVid].play();
 				}
-
-				if (autoPlay)
-					sounds[currentVid].play();
-			}
-			else {
-				cout << "Check sounds folder name..." << endl;
+				else {
+					cout << "Check sounds folder name..." << endl;
+				}
 			}
 		}
 
 		void draw() {
-			ofSoundUpdate();
+			if(loadSound)
+				ofSoundUpdate();
 
-			if (player[currentVid]->isLoaded() && sounds[currentVid].isLoaded())
-			{
-				if(player[currentVid]->isPlaying())
-					player[currentVid]->draw(vidX,vidY,vidW,vidH);
 
-				///if (sounds[currentVid].isPlaying())
+			if (loadSound) {
+				if (player[currentVid]->isLoaded() && sounds[currentVid].isLoaded())
+				{
+					if (player[currentVid]->isPlaying())
+						player[currentVid]->draw(vidX, vidY, vidW, vidH);
 
-				/*if (player[currentVid]->getIsMovieDone()) {
-					if (player[currentVid]->getLoopState() == OF_LOOP_NORMAL)
-						loadNext();
-					else
-						player[currentVid]->stop();
-				}*/
+					///if (sounds[currentVid].isPlaying())
+
+					/*if (player[currentVid]->getIsMovieDone()) {
+						if (player[currentVid]->getLoopState() == OF_LOOP_NORMAL)
+							loadNext();
+						else
+							player[currentVid]->stop();
+					}*/
+				}
 			}
+			else {
+				if (player[currentVid]->isLoaded())
+				{
+					if (player[currentVid]->isPlaying())
+						player[currentVid]->draw(vidX, vidY, vidW, vidH);
+				}
+			}
+			
 		}
 
 		void loadNext() {
@@ -195,14 +215,18 @@ class ofxFilikaHapPlayer
 				currentVid++;
 				currentVid %= dir.size();
 				player[currentVid]->play();
-				sounds[currentVid].play();
+				if(loadSound)
+					sounds[currentVid].play();
 			}
 		}
 
 		void loadVideoById(int _id) {
 			currentVid = _id;
-			sounds[currentVid].stop();
-			sounds[currentVid].play();
+			if (loadSound) {
+				sounds[currentVid].stop();
+				sounds[currentVid].play();
+			}
+			
 			player[currentVid]->stop();
 			player[currentVid]->play();
 		}
