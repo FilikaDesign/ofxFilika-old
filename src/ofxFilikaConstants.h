@@ -1,4 +1,5 @@
 #pragma once
+#define TOUCH_ENABLE
 /* TYPE DEFINITIONS */
 typedef enum { 
 	TR, 
