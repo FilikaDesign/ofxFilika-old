@@ -9,20 +9,10 @@
 #define ofxFilikaImageButton_h
 
 #include "ofMain.h"
+#include "ofxFilikaConstants.h"
 //#include "ofxTweenzor.h"
 
-enum ofxFilikaImageButtonBgMode {
-	NONE,
-	CUSTOM,
-	RECTANGLE,
-	ELLIPSE,
-	IMAGE
-};
 
-enum ofxFilikaImageButtonPivot {
-	CENTER,
-	TOP_LEFT
-};
 
 class ofxFilikaImageButton {
 private:
@@ -85,12 +75,15 @@ public:
 		textPos = _textPos;
 	}
 
-	void setOverlayText(string _str, ofxFilikaImageButtonPivot _alignment = TOP_LEFT) {
+	void setOverlayText(string _str, ofxFilikaAlignment _alignment = TOP_LEFT, int _hTrFix = 0) {
 		textStr = _str;
 
 		if (_alignment == CENTER) {
 			textPos.x = -textFont->getStringBoundingBox(_str, 0, 0).getWidth()*0.5;
-			textPos.y = textFont->getStringBoundingBox(_str, 0, 0).getHeight()*0.5;
+			if(_hTrFix == 0)
+				textPos.y = textFont->getStringBoundingBox(_str, 0, 0).getHeight()*0.5;
+			else 
+				textPos.y = textFont->getStringBoundingBox("W", 0, 0).getHeight()*0.5 + _hTrFix;
 		}
 	}
 
@@ -148,12 +141,12 @@ public:
 		if (_pivot == "center") {
 			pivotPoint.x = getWidth() * 0.5;
 			pivotPoint.y = getHeight() * 0.5;
-			pivot = ofxFilikaImageButtonPivot::CENTER;
+			pivot = ofxFilikaAlignment::CENTER;
 		}
 		else if (_pivot == "tl") {
 			pivotPoint.x = 0;
 			pivotPoint.y = 0;
-			pivot = ofxFilikaImageButtonPivot::TOP_LEFT;
+			pivot = ofxFilikaAlignment::TOP_LEFT;
 		}
 	}
 
@@ -207,7 +200,7 @@ public:
 	////////////////////////////////////////////////
 	// SETUP
 	////////////////////////////////////////////////
-	void setup(string _imgPath, int _size, int _id, ofxFilikaImageButtonBgMode _bgMode = IMAGE, ofVec2f _bgSize = ofVec2f(-1, -1), ofColor _mainColor = ofColor(0), bool _isAnimatable = true) {
+	void setup(string _imgPath, int _size, int _id, ofxFilikaBgMode _bgMode = IMAGE, ofVec2f _bgSize = ofVec2f(-1, -1), ofColor _mainColor = ofColor(0), bool _isAnimatable = true) {
 
 		ofSetCircleResolution(64);
 
@@ -283,7 +276,7 @@ public:
 
 
 		setPivot("center");
-		pivot = ofxFilikaImageButtonPivot::CENTER;
+		pivot = ofxFilikaAlignment::CENTER;
 	}
 
 	////////////////////////////////////////////////
@@ -303,27 +296,27 @@ public:
 
 		ofScale(scaleFac, scaleFac); // Scale Value of the container
 
-		if (bgMode == ofxFilikaImageButtonBgMode::CUSTOM) { // Set background color and shape ROUNDED RECTANGLE
+		if (bgMode == ofxFilikaBgMode::CUSTOM) { // Set background color and shape ROUNDED RECTANGLE
 			ofPushMatrix();
 			ofRotate(45);
 			ofSetColor(mainColor);
 			ofDrawRectRounded(-size*0.5, -size*0.5, size, size, 30);
 			ofPopMatrix();
 		}
-		else if (bgMode == ofxFilikaImageButtonBgMode::RECTANGLE) { // Set background color and shape RECTANGLE
+		else if (bgMode == ofxFilikaBgMode::RECTANGLE) { // Set background color and shape RECTANGLE
 			ofPushMatrix();
 			ofSetColor(mainColor);
 			ofDrawRectangle(-bgSize.x*0.5, -bgSize.y*0.5, bgSize.x, bgSize.y);
 			ofPopMatrix();
 		}
-		else if (bgMode == ofxFilikaImageButtonBgMode::ELLIPSE) { // Set background color and shape ELLIPSE
+		else if (bgMode == ofxFilikaBgMode::ELLIPSE) { // Set background color and shape ELLIPSE
 			ofPushMatrix();
 			ofSetColor(mainColor);
 			ofDrawEllipse(0, 0, bgSize.x, bgSize.y);
 			ofPopMatrix();
 		}
 
-		if (bgMode == ofxFilikaImageButtonBgMode::IMAGE)
+		if (bgMode == ofxFilikaBgMode::IMAGE)
 		{
 			ofSetColor(255, 255); // Add passive mode image
 			if (!isPassiveMode)
@@ -461,10 +454,10 @@ public:
 	////////////////////////////////////////////////
 	bool hit(int _x, int _y) {
 
-		if(pivot == ofxFilikaImageButtonPivot::CENTER)
+		if(pivot == ofxFilikaAlignment::CENTER)
 			result = (_x < xpos + _w*0.5 && _x > xpos - _w*0.5 && _y > ypos - _h*0.5 && _y < ypos + _h*0.5) ? true : false;
 
-		else if(pivot == ofxFilikaImageButtonPivot::TOP_LEFT)
+		else if(pivot == ofxFilikaAlignment::TOP_LEFT)
 			result = (_x > xpos && _x < xpos + _w && _y > ypos && _y < ypos + _h) ? true : false;
 
 		return result;

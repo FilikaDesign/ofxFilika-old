@@ -58,11 +58,8 @@ public:
 		ofAddListener(ofEvents().mousePressed, this, &ofxFilikaContentScroller::moveMouseContentPressed);
 #endif	
 		if (isScrollBarVisible)
-			ofRemoveListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
+			ofAddListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
 
-		ofAddListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
-
-		isScrollBarVisible = false;
 
 		// Scroll Nav buttons enabled
 		if (isScrollNavEnable) {
@@ -83,7 +80,6 @@ public:
 		if (isScrollBarVisible)
 			ofRemoveListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
 
-		isScrollBarVisible = false;
 
 		// Scroll Nav buttons enabled
 		if (isScrollNavEnable) {

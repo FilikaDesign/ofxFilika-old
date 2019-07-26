@@ -9,8 +9,6 @@
 
 #include "ofMain.h"
 
-/* TYPE DEFINITIONS */
-typedef enum { TR, ENG, ARABIC, FR } Language;
 
 class ofxFilikaUtils {
 private:

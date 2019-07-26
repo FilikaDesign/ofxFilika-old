@@ -10,22 +10,10 @@
 
 #include "ofMain.h"
 //#include "ofxTweenzor.h"
+#include "ofxFilikaConstants.h"
 
 
 
-typedef enum ofxFilikaBgMode {
-	BG_NONE,
-	BG_CUSTOM,
-	BG_RECTANGLE,
-	BG_ELLIPSE
-}ofxFilikaBgMode;
-
-typedef enum ofxFilikaButtonMode {
-	MODE_IMAGE,
-	MODE_SHAPE_ROUNRECT,
-	MODE_SHAPE_RECTANGLE,
-	MODE_SHAPE_ELLIPSE
-}ofxFilikaButtonMode;
 
 
 class ofxFilikaDraggableButton {
@@ -251,7 +239,7 @@ public:
 		isMouseEnabled = true;
 #endif
         isEnabledInteraction = true;
-        buttonMode = ofxFilikaButtonMode::MODE_SHAPE_ROUNRECT;
+        buttonMode = ofxFilikaButtonMode::BUTTON_MODE_SHAPE_ROUNRECT;
         
         mainColor = _mainColor;
         isAnimatable = _isAnimatable;
@@ -263,7 +251,7 @@ public:
 		_scaleMaxVal = 1;
         
         btnAnimT = 0.125;
-        bgMode = ofxFilikaBgMode::BG_NONE;
+        bgMode = ofxFilikaBgMode::NONE;
         
         
         _w = _size.x;
@@ -292,7 +280,7 @@ public:
 		isMouseEnabled = true;
 #endif
 		isEnabledInteraction = true;
-        buttonMode = ofxFilikaButtonMode::MODE_IMAGE;
+        buttonMode = ofxFilikaButtonMode::BUTTON_MODE_IMAGE;
 
 		mainColor = _mainColor;
 		isAnimatable = _isAnimatable;
@@ -308,7 +296,7 @@ public:
 		imgPath = _imgPath;
 
 		btnAnimT = 0.125;
-		bgMode = ofxFilikaBgMode::BG_NONE;
+		bgMode = ofxFilikaBgMode::NONE;
 
 
 		if(imgPath != "")
@@ -366,20 +354,20 @@ public:
 
 		ofScale(scaleFac, scaleFac); // Scale Value of the container
 
-		if (bgMode == ofxFilikaBgMode::BG_CUSTOM) { // Set background color and shape ROUNDED RECTANGLE
+		if (bgMode == ofxFilikaBgMode::CUSTOM) { // Set background color and shape ROUNDED RECTANGLE
 			ofPushMatrix();
 			ofRotate(45);
 			ofSetColor(mainColor);
 			ofDrawRectRounded(-bgSize.x*0.5, -bgSize.y*0.5, bgSize.x, bgSize.y, 30);
 			ofPopMatrix();
 		}
-		else if (bgMode == ofxFilikaBgMode::BG_RECTANGLE) { // Set background color and shape RECTANGLE
+		else if (bgMode == ofxFilikaBgMode::RECTANGLE) { // Set background color and shape RECTANGLE
 			ofPushMatrix();
 			ofSetColor(mainColor);
 			ofDrawRectangle(-bgSize.x*0.5, -bgSize.y*0.5, bgSize.x, bgSize.y);
 			ofPopMatrix();
 		}
-		else if (bgMode == ofxFilikaBgMode::BG_ELLIPSE) { // Set background color and shape ELLIPSE
+		else if (bgMode == ofxFilikaBgMode::ELLIPSE) { // Set background color and shape ELLIPSE
 			ofPushMatrix();
 			ofSetColor(mainColor);
 			ofDrawEllipse(0, 0, bgSize.x, bgSize.y);
@@ -387,7 +375,7 @@ public:
 		}
 
 		ofSetColor(255, 255); // Add passive mode image
-        if(buttonMode == ofxFilikaButtonMode::MODE_IMAGE) {
+        if(buttonMode == ofxFilikaButtonMode::BUTTON_MODE_IMAGE) {
             if (!isPassiveMode) {
 				if (pivot == "center") {
 					imge.draw(-imge.getWidth() * 0.5, -imge.getHeight() * 0.5);
@@ -398,7 +386,7 @@ public:
 			}else{
                 imgePassive.draw(-imgePassive.getWidth() * 0.5, -imgePassive.getHeight() * 0.5);
 			}
-        }else if(buttonMode == ofxFilikaButtonMode::MODE_SHAPE_ROUNRECT) {
+        }else if(buttonMode == ofxFilikaButtonMode::BUTTON_MODE_SHAPE_ROUNRECT) {
             ofSetColor(mainColor);
             ofDrawRectRounded(ofRectangle(0,0,_w, _h), sbRoundness, sbRoundness, sbRoundness, sbRoundness);
         }
