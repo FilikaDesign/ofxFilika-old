@@ -176,6 +176,15 @@ public:
 		return ext;
 	}
 
+	int getNumWords(std::string str)
+	{
+		int word_count(0);
+		std::stringstream ss(str);
+		std::string word;
+		while (ss >> word) ++word_count;
+		return word_count;
+	};
+
 	/* XML Operations */
 	void loadXml(string _src) {
 		xmlFile = _src;
