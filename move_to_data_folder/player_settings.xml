@@ -1,0 +1,13 @@
+<root>
+    <SOURCE_FOLDER>/Users/alptugan/oF/assets/hap</SOURCE_FOLDER>
+    <VID_SPEED>1</VID_SPEED>
+    <VID_VOLUME>1</VID_VOLUME>
+    <VID_IS_LOOPING>1</VID_IS_LOOPING>
+    <VID_X>0</VID_X>
+    <VID_Y>0</VID_Y>
+    <VID_W>full</VID_W>
+    <VID_H>full</VID_H>
+    <VID_ID_TO_START>0</VID_ID_TO_START>
+    <BTN_PLAY>btnplayw.png</BTN_PLAY>
+    <BTN_PAUSE>btnpausew.png</BTN_PAUSE>
+</root>
