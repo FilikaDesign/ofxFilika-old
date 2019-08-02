@@ -349,7 +349,7 @@ class ofxFilikaHapPlayer
                     drawNavBar = true;
                 }
                 
-                if(showCover || player[currentVid]->isPaused() || player[currentVid]->getIsMovieDone()) {
+                if(showCover) {
                     coverImages[currentVid].draw(vidX, vidY, vidW, vidH);
                     ofPushStyle();
                     ofSetColor(0,0,0,130);
@@ -359,10 +359,13 @@ class ofxFilikaHapPlayer
                     ofPopStyle();
                 }
                 
+                if(player[currentVid]->isPaused() || player[currentVid]->getIsMovieDone()) {
+                    //showCover = true;
+                }
+                
                 if(drawNavBar && showCover == false)
                 {
                     // Scrubbing
-                    
                     ofPushStyle();
                     ofRectangle bar = getBarRectangle();
                     ofFill();
@@ -386,9 +389,9 @@ class ofxFilikaHapPlayer
                     // Place play/pause Button
                     if(player[currentVid]->isPaused() || player[currentVid]->getIsMovieDone()) {
                         btnPlayPause.setPassive(false);
-                        showCover = true;
+                        //showCover = true;
                     }else{
-                        showCover = false;
+                        //showCover = false;
                         btnPlayPause.setPassive(true);
                     }
                     btnPlayPause.draw(navBarMargin, barFill.y + barFill.getHeight() * 0.5 - btnPlayPause.getHeight() * 0.5);
@@ -430,6 +433,10 @@ private:
     void onPlayPauseDown(int & _id) {
         
         player[currentVid]->setPaused(!player[currentVid]->isPaused());
+        
+        if(player[currentVid]->isPaused()) {
+            showCover = true;
+        }
     }
     
     void onPlayBigDown(int & _id) {
@@ -480,11 +487,13 @@ private:
         ofRectangle bar = getBarRectangle();
         if (bar.inside(args.x, args.y))
         {
+            showCover = false;
             inNavBar = true;
             wasPaused = player[currentVid]->isPaused() || player[currentVid]->getIsMovieDone();
             player[currentVid]->setPaused(true);
             pointerDragged(glm::vec2(args.x, args.y));
         }
+        
         if(isNavBarAutoHide)
             lastMovement = ofGetSystemTimeMillis();
     }
@@ -500,6 +509,7 @@ private:
     void pointerDragged(glm::vec2 args) {
         if (inNavBar)
         {
+            showCover = false;
             float position = static_cast<float>(args.x - navBarMargin - btnPW) / getBarRectangle().width;
             position = std::max(0.0f, std::min(position, 1.0f));
             player[currentVid]->setPosition(position);
