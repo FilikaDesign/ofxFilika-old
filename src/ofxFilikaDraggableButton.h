@@ -39,9 +39,8 @@ private:
     float btnAnimT;
 	ofxFilikaBgMode bgMode;
 	ofxFilikaButtonMode buttonMode;
-    ofVec2f bgSize;
-    ofVec2f touchStartPos;
-	ofVec2f interactionArea;
+    glm::vec2 bgSize;
+    glm::vec2 interactionArea;
     int sbRoundness;
 public:
 	
@@ -136,7 +135,19 @@ public:
 	void setBackgroundShape(ofxFilikaBgMode _mode) {
 		bgMode = _mode;
 	}
-
+    
+    void setButtonSize(int ww, int hh) {
+        
+        imge.resize(ww,hh);
+        imgePassive.resize(ww,hh);
+        
+        _w = ww;
+        _h = hh;
+        
+        setInteractionArea(glm::vec2(_w, _h));
+        setPivot(pivot);
+    }
+    
 	void setPassiveImage(string src) {
 		imgePassive.load(src);
 		imgePassive.resize(_w, _h);
@@ -169,7 +180,7 @@ public:
         }
 	}
 
-	void setInteractionArea(ofVec2f _a) {
+    void setInteractionArea(glm::vec2 _a) {
 		interactionArea = _a;
 	}
 
@@ -206,6 +217,10 @@ public:
 		return isEnabledInteraction;
 	}
 
+    glm::vec2 getInteractionRect() const {
+        
+        return interactionArea;
+    }
 	////////////////////////////////////////////////
 	// CONSTRUCTOR
 	////////////////////////////////////////////////
@@ -256,7 +271,8 @@ public:
         
         _w = _size.x;
         _h = _size.y;
-
+        
+     
 		interactionArea.x = _w;
 		interactionArea.y = _h;
         
@@ -311,7 +327,7 @@ public:
 			_h = imge.getHeight();
 		}
 
-		
+       
 			/*float aspect = imge.getWidth() / imge.getHeight();
 			float gap = 0.75;
 
@@ -356,7 +372,7 @@ public:
 
 		if (bgMode == ofxFilikaBgMode::CUSTOM) { // Set background color and shape ROUNDED RECTANGLE
 			ofPushMatrix();
-			ofRotate(45);
+			ofRotateDeg(45);
 			ofSetColor(mainColor);
 			ofDrawRectRounded(-bgSize.x*0.5, -bgSize.y*0.5, bgSize.x, bgSize.y, 30);
 			ofPopMatrix();
@@ -384,19 +400,24 @@ public:
 					imge.draw(0, 0);
 				}
 			}else{
-                imgePassive.draw(-imgePassive.getWidth() * 0.5, -imgePassive.getHeight() * 0.5);
+                if (pivot == "center") {
+                    imgePassive.draw(-imgePassive.getWidth() * 0.5, -imgePassive.getHeight() * 0.5);
+                }
+                else if (pivot == "tl") {
+                    imgePassive.draw(0, 0);
+                }
 			}
         }else if(buttonMode == ofxFilikaButtonMode::BUTTON_MODE_SHAPE_ROUNRECT) {
             ofSetColor(mainColor);
-            ofDrawRectRounded(ofRectangle(0,0,_w, _h), sbRoundness, sbRoundness, sbRoundness, sbRoundness);
+            ofDrawRectRounded(ofRectangle(0, 0, _w, _h), sbRoundness, sbRoundness, sbRoundness, sbRoundness);
         }
 		
 		ofPopMatrix();
 	}
     
-    void draw() {
+    /*void draw() {
         
-    }
+    }*/
 
 
 	////////////////////////////////////////////////
@@ -542,7 +563,7 @@ public:
 	////////////////////////////////////////////////
 	bool hit(int _x, int _y) {
         if(pivot == "center")
-            result = (_x < xpos + interactionArea.x*0.5 && _x > xpos - interactionArea.x*0.5 && _y > ypos - interactionArea.y*0.5 && _y < ypos + interactionArea.y*0.5) ? true : false;
+            result = (_x < xpos + interactionArea.x * 0.5 && _x > xpos - interactionArea.x * 0.5 && _y > ypos - interactionArea.y * 0.5 && _y < ypos + interactionArea.y * 0.5) ? true : false;
         
 		if (pivot == "tl") {
 			if (_w == interactionArea.x && _h == interactionArea.y) {
