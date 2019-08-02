@@ -349,7 +349,7 @@ class ofxFilikaHapPlayer
                     drawNavBar = true;
                 }
                 
-                if(showCover) {
+                if(showCover && isCoverImagesEnabled) {
                     coverImages[currentVid].draw(vidX, vidY, vidW, vidH);
                     ofPushStyle();
                     ofSetColor(0,0,0,130);
@@ -432,17 +432,24 @@ class ofxFilikaHapPlayer
 private:
     void onPlayPauseDown(int & _id) {
         
+		if (loadSound) {
+			sounds[currentVid].setPaused(!player[currentVid]->isPaused());
+		}
+
         player[currentVid]->setPaused(!player[currentVid]->isPaused());
+
         
-        if(player[currentVid]->isPaused()) {
+        if(player[currentVid]->isPaused() && isCoverImagesEnabled) {
             showCover = true;
         }
     }
     
     void onPlayBigDown(int & _id) {
         
-        player[currentVid]->play();
-        showCover = false;
+		if (isCoverImagesEnabled) {
+			player[currentVid]->play();
+			showCover = false;
+		}
     }
 
     ofRectangle getBarRectangle() const
@@ -491,6 +498,11 @@ private:
             inNavBar = true;
             wasPaused = player[currentVid]->isPaused() || player[currentVid]->getIsMovieDone();
             player[currentVid]->setPaused(true);
+
+			if (loadSound) {
+				sounds[currentVid].setPaused(true);
+			}
+
             pointerDragged(glm::vec2(args.x, args.y));
         }
         
@@ -503,6 +515,10 @@ private:
         {
             inNavBar = false;
             player[currentVid]->setPaused(wasPaused);
+
+			if (loadSound) {
+				sounds[currentVid].setPaused(wasPaused);
+			}
         }
     }
     
@@ -513,6 +529,10 @@ private:
             float position = static_cast<float>(args.x - navBarMargin - btnPW) / getBarRectangle().width;
             position = std::max(0.0f, std::min(position, 1.0f));
             player[currentVid]->setPosition(position);
+
+			if (loadSound) {
+				sounds[currentVid].setPosition(position);
+			}
             
             if(isNavBarAutoHide)
                 lastMovement = ofGetSystemTimeMillis();
