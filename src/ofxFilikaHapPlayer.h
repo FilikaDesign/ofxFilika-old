@@ -16,6 +16,7 @@
 /****************************************************************************
 XML SETTINGS STRUCTURE
 *****************************************************************************
+<?xml version="1.0" encoding="utf-8"?>
  <root>
      <SOURCE_FOLDER>/Users/alptugan/oF/assets/hap</SOURCE_FOLDER>
      <SOUND_FOLDER></SOUND_FOLDER>
@@ -37,7 +38,7 @@ XML SETTINGS STRUCTURE
  ofxFilikaHapPlayer player;
  
  In .cpp file;
- player.setup("path_to_settings_file.xml", bool autoplay = false, bool loadsound = false, bool navigation = false);
+ player.setup("path_to_settings_file.xml", bool autoplay = false, bool loadsound = false, bool navigation = false, bool enableCoverImages = false);
  
 */
 
