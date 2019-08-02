@@ -6,21 +6,6 @@
 #include "ofMain.h"
 #include "ofEvents.h"
 
-static class ofxFilikaZoomEvent {
-public:
-	float distance;
-	glm::vec2 center;
-	float scale;
-};
-
-
-static class ofxFilikaRotationEvent {
-public:
-	glm::vec2 center;
-	float rotation;
-
-};
-
 //touch
 static float _tempDist;
 static float _curDist;
@@ -31,8 +16,6 @@ static WNDPROC prevWndProc;
 /* Get window pointer */
 
 // MULTI TOUCH EVENT ARGS
-static ofEvent<ofxFilikaZoomEvent> OFX_FILIKA_ZOOM_EVENT;
-static ofEvent<ofxFilikaRotationEvent> OFX_FILIKA_ROTATION_EVENT;
 static ofEvent<void> OFX_FILIKA_GESTURE_BEGIN_EVENT;
 static ofEvent<void> OFX_FILIKA_GESTURE_END_EVENT;
 
@@ -212,8 +195,6 @@ static LRESULT DecodeGesture(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	BOOL bResult = GetGestureInfo((HGESTUREINFO)lParam, &gi);
 	BOOL bHandled = FALSE;
 
-	ofxFilikaZoomEvent zoomGesture;
-	ofxFilikaRotationEvent rotationGesture;
 
 	if (bResult) {
 		// now interpret the gesture
@@ -242,16 +223,6 @@ static LRESULT DecodeGesture(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 				_gestureBegin = true;
 			}
 
-			//cout << "x: " << gi.ptsLocation.x - ofGetWindowPositionX() << endl;
-			//cout << "y: " << gi.ptsLocation.y - ofGetWindowPositionY() << endl;
-
-			//cout << "ZOOM x:y " << gi.ptsLocation.x << ":" << gi.ptsLocation.y << endl;
-
-			zoomGesture.center = glm::vec2(gi.ptsLocation.x - ofGetWindowPositionX(), gi.ptsLocation.y - ofGetWindowPositionY());
-			zoomGesture.distance = gi.ullArguments;
-			zoomGesture.scale = getPinchScale(gi.ullArguments);
-
-			ofNotifyEvent(OFX_FILIKA_ZOOM_EVENT, zoomGesture);
 
 			break;
 
@@ -266,8 +237,6 @@ static LRESULT DecodeGesture(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			//cout << "Rotation center " << gi.ptsLocation.x << ":" << gi.ptsLocation.y << endl;
 			//cout << ArgToRadians(gi.ullArguments) << endl;
 
-			rotationGesture.center = glm::vec2(gi.ptsLocation.x - ofGetWindowPositionX(), gi.ptsLocation.y - ofGetWindowPositionY());
-			rotationGesture.rotation = rotationToRad(gi.ullArguments);
 
 			//ofNotifyEvent(OFX_FILIKA_ROTATION_EVENT, rotationGesture);
 

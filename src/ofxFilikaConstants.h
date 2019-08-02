@@ -8,6 +8,7 @@ typedef enum {
 	FR 
 } Language;
 
+/* ALIGNMENT */
 typedef enum { 
 	TOP_LEFT, 
 	TOP_RIGHT, 
@@ -21,6 +22,9 @@ typedef enum {
 	CUSTOM_POS
 } ofxFilikaAlignment;
 
+/* Background shape mode for buttons 
+   These type defs should be depreciated
+*/
 typedef enum  {
 	NONE,
 	CUSTOM,
@@ -29,6 +33,7 @@ typedef enum  {
 	IMAGE
 } ofxFilikaBgMode;
 
+/* Draggable button modes. Buttons could be either image or vector shape */
 typedef enum  {
 	BUTTON_MODE_IMAGE,
 	BUTTON_MODE_CUSTOM,
@@ -36,3 +41,11 @@ typedef enum  {
 	BUTTON_MODE_SHAPE_RECTANGLE,
 	BUTTON_MODE_SHAPE_ELLIPSE
 }ofxFilikaButtonMode;
+
+
+typedef enum {
+	SWIPE_UP,
+	SWIPE_DOWN,
+	SWIPE_LEFT,
+	SWIPE_RIGHT
+} ofxFilikaTouchGestures;

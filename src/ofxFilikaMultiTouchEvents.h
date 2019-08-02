@@ -1,8 +1,10 @@
 #pragma once
 #include "ofMain.h"
+#include "ofxFilikaConstants.h"
 
 class ofxFilikaMultiTouchEvents {
-	
+public:
+	ofEvent<ofxFilikaSwipeEvent> SWIPE_EVENT;
 };
 
 class ofxFilikaZoomEvent {
@@ -18,4 +20,10 @@ public:
 	glm::vec2 center;
 	float rotation;
 
+};
+
+class ofxFilikaSwipeEvent {
+public:
+	ofxFilikaTouchGestures swipeDir;
+	int touchNum;
 };
