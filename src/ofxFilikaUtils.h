@@ -19,7 +19,8 @@ class ofxFilikaUtils {
 private:
 	ofXml xml;
 	string xmlFile;
-
+    ofBitmapFont bf;
+    
 public:
     #ifdef WIN32
 	bool pingIpAdd(const char argv[], bool _verbose = false) {
@@ -230,7 +231,30 @@ public:
 		while (ss >> word) ++word_count;
 		return word_count;
 	};
-
+    
+    /* CONVERT UNICODE(TR) TO LATIN(EN) CHARS */
+    string convertToNonUnicodeText(string _str) {
+        string tr []= {"ı","İ","ş","Ş","ğ","Ğ","ç","Ç","ö","Ö","ü","Ü"," "};
+        string en []= {"i","i","s","s","g","g","c","c","o","o","u","u","_"};
+        
+        int ko = sizeof(tr)/sizeof(string);
+        
+        for (int i = 0; i < ko; i++) {
+            ofStringReplace(_str, tr[i], en[i]);
+        }
+        
+        return _str;
+    }
+    
+    /* CONVERT String To Char */
+    /* Usage:
+     char * foo = utils.convertStringToChar("Test String");
+    */
+    char * convertStringToChar(string _str) {
+        char *foo = (char*)(&_str);
+        return foo;
+    }
+    
 	/* XML Operations */
 	void loadXml(string _src) {
 		xmlFile = _src;
@@ -312,48 +336,56 @@ public:
 		xml.save(_fileName);
 	}
     
-    void drawFPS(ofxFilikaAlignment _position) {
+    void drawFPS(ofxFilikaAlignment _position, int _x = 0, int _y = 0) {
         int x = 0;
         int y = 0;
+        
+        string fr = ofToString(ofGetFrameRate(),1);
         
         switch(_position) {
             case TOP_LEFT:
                 x = 0;
-                y = 20;
+                y = bf.getBoundingBox(fr, 0, 0).getHeight();
                 break;
             case TOP_RIGHT:
-                x = ofGetWidth() - 40;
-                y = 20;
+                x = ofGetWidth() - bf.getBoundingBox(fr, 0, 0).getWidth();
+                y = bf.getBoundingBox(fr, 0, 0).getHeight();;
                 break;
             case BOTTOM_RIGHT:
-                x = ofGetWidth() - 40;
-                y = ofGetHeight() - 20;
+                x = ofGetWidth() - bf.getBoundingBox(fr, 0, 0).getWidth();
+                y = ofGetHeight() - bf.getBoundingBox(fr, 0, 0).getHeight();
                 break;
             case BOTTOM_LEFT:
                 x = 0;
-                y = ofGetHeight() - 20;;
+                y = ofGetHeight() - bf.getBoundingBox(fr, 0, 0).getHeight();
                 break;
-            /*case TOP_MIDDLE:
-                <#code#>
+            case TOP_MIDDLE:
+                x = ofGetWidth() * 0.5 - bf.getBoundingBox(fr, 0, 0).getWidth() * 0.5;
+                y = bf.getBoundingBox(fr, 0, 0).getHeight();
                 break;
             case CENTER:
-                <#code#>
+                x = ofGetWidth() * 0.5 - bf.getBoundingBox(fr, 0, 0).getWidth() * 0.5;
+                y = ofGetHeight() * 0.5 - bf.getBoundingBox(fr, 0, 0).getHeight() * 0.5;
                 break;
             case CENTER_LEFT:
-                <#code#>
+                x = 0;
+                y = ofGetHeight() * 0.5 - bf.getBoundingBox(fr, 0, 0).getHeight() * 0.5;
                 break;
             case CENTER_RIGHT:
-                <#code#>
+                x = ofGetWidth() - bf.getBoundingBox(fr, 0, 0).getWidth();
+                y = ofGetHeight() * 0.5 - bf.getBoundingBox(fr, 0, 0).getHeight() * 0.5;
                 break;
             case BOTTOM_MIDDLE:
-                <#code#>
+                x = ofGetWidth() * 0.5 - bf.getBoundingBox(fr, 0, 0).getWidth() * 0.5;
+                y = ofGetHeight() - bf.getBoundingBox(fr, 0, 0).getHeight();
                 break;
             case CUSTOM_POS:
-                <#code#>
-                break;*/
+                x = _x;
+                y = _y;
+                break;
         }
         
-        ofDrawBitmapStringHighlight(ofToString(ofGetFrameRate(),1), x, y);
+        ofDrawBitmapStringHighlight(fr, x, y);
         
     }
 };
