@@ -10,6 +10,7 @@
 #endif
 
 #include "ofMain.h"
+#include "ofxFilikaConstants.h"
 
 #define SECS_PER_MIN 60
 #define SECS_PER_HOUR 3600
@@ -310,4 +311,49 @@ public:
 	void writeXml(string _fileName) {
 		xml.save(_fileName);
 	}
+    
+    void drawFPS(ofxFilikaAlignment _position) {
+        int x = 0;
+        int y = 0;
+        
+        switch(_position) {
+            case TOP_LEFT:
+                x = 0;
+                y = 20;
+                break;
+            case TOP_RIGHT:
+                x = ofGetWidth() - 40;
+                y = 20;
+                break;
+            case BOTTOM_RIGHT:
+                x = ofGetWidth() - 40;
+                y = ofGetHeight() - 20;
+                break;
+            case BOTTOM_LEFT:
+                x = 0;
+                y = ofGetHeight() - 20;;
+                break;
+            /*case TOP_MIDDLE:
+                <#code#>
+                break;
+            case CENTER:
+                <#code#>
+                break;
+            case CENTER_LEFT:
+                <#code#>
+                break;
+            case CENTER_RIGHT:
+                <#code#>
+                break;
+            case BOTTOM_MIDDLE:
+                <#code#>
+                break;
+            case CUSTOM_POS:
+                <#code#>
+                break;*/
+        }
+        
+        ofDrawBitmapStringHighlight(ofToString(ofGetFrameRate(),1), x, y);
+        
+    }
 };
