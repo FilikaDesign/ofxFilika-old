@@ -55,7 +55,7 @@ private:
 		stopThread();
 	}
 
-	void SetTabletTipKey(LPCTSTR key, DWORD kVaule)
+	/*void SetTabletTipKey(LPCTSTR key, DWORD kVaule)
 	{
 		HKEY hTabletTip = NULL;
 		LSTATUS lres = 0;
@@ -71,7 +71,7 @@ private:
 		}
 		RegCloseKey(hTabletTip);
 		cout << "consoled run virtual keyboard constructor" << endl;
-	}
+	}*/
 
 	
 };

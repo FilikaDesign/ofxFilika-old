@@ -43,6 +43,7 @@ private:
 	ofColor scColor, scOverColor, scPressedColor;
 
 	bool isScrollNavEnable;
+	bool isPointerDown;
 
 	void isDraggingHandler(ofVec2f & _p) {
 		moveContent(_p);
@@ -53,9 +54,11 @@ public:
 #ifdef TOUCH_ENABLE
 		ofAddListener(ofEvents().touchMoved, this, &ofxFilikaContentScroller::touchMoveContentTouchHandler);
 		ofAddListener(ofEvents().touchDown, this, &ofxFilikaContentScroller::touchDownContentTouchHandler);
+		ofAddListener(ofEvents().touchUp, this, &ofxFilikaContentScroller::touchUpContentTouchHandler);
 #else
 		ofAddListener(ofEvents().mouseDragged, this, &ofxFilikaContentScroller::moveMouseContent);
 		ofAddListener(ofEvents().mousePressed, this, &ofxFilikaContentScroller::moveMouseContentPressed);
+		ofAddListener(ofEvents().mouseReleased, this, &ofxFilikaContentScroller::moveMouseContentReleased);
 #endif	
 		if (isScrollBarVisible)
 			ofAddListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
@@ -73,9 +76,11 @@ public:
 #ifdef TOUCH_ENABLE
 		ofRemoveListener(ofEvents().touchMoved, this, &ofxFilikaContentScroller::touchMoveContentTouchHandler);
 		ofRemoveListener(ofEvents().touchDown, this, &ofxFilikaContentScroller::touchDownContentTouchHandler);
+		ofRemoveListener(ofEvents().touchUp, this, &ofxFilikaContentScroller::touchUpContentTouchHandler);
 #else
 		ofRemoveListener(ofEvents().mousePressed, this, &ofxFilikaContentScroller::moveMouseContentPressed);
 		ofRemoveListener(ofEvents().mouseDragged, this, &ofxFilikaContentScroller::moveMouseContent);
+		ofRemoveListener(ofEvents().mouseReleased, this, &ofxFilikaContentScroller::moveMouseContentReleased);
 #endif	
 		if (isScrollBarVisible)
 			ofRemoveListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
@@ -92,7 +97,7 @@ public:
 
 	void setup(ofRectangle _contentRect, ofBaseDraws * _content = nullptr, int _sbGap = 1) {
 		this->set(_contentRect);
-
+		isPointerDown = false;
 
 		sbGap = _sbGap;
 		sbColor = ofColor(150, 150, 150, 60);
@@ -117,6 +122,11 @@ public:
 	void touchDownContentTouchHandler(ofTouchEventArgs  & e) {
 		pointerDown(glm::vec2(e.x, e.y));
 	}
+
+	void touchUpContentTouchHandler(ofTouchEventArgs & e) {
+		pointerUp(glm::vec2(e.x, e.y));
+	}
+
 #else
 	void moveMouseContentPressed(ofMouseEventArgs & e) {
 		pointerDown(glm::vec2(e.x, e.y));
@@ -125,17 +135,26 @@ public:
 	void moveMouseContent(ofMouseEventArgs & e) {
 		pointerMove(glm::vec2(e.x, e.y));
 	}
+
+	void moveMouseContentReleased(ofMouseEventArgs & e) {
+		pointerUp(glm::vec2(e.x, e.y));
+	}
 #endif	
 	void pointerDown(glm::vec2 e) {
-		if (e.x > this->x && e.x < this->x + this->getWidth() && e.y > this->y && e.y < this->y + this->getHeight()) {
+		if (this->inside(e)) {
 			//saveX = e.x - scrollerBtn.getPos().x;
 			saveY = ofMap(e.y, scrollBarRect.y, scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y) - scrollerRect.y;
+			isPointerDown = true;
 		}
 	}
 
-	void pointerMove(glm::vec2 e) {
-		if (e.x > this->x && e.x < this->x + this->getWidth() && e.y > this->y && e.y < this->y + this->getHeight()) {
+	void pointerUp(glm::vec2 e) {
+		isPointerDown = false;
+	}
 
+	void pointerMove(glm::vec2 e) {
+		if (isPointerDown && this->inside(e)) {
+			
 			moveContent(glm::vec2(0, ofMap(e.y, scrollBarRect.y, scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y) - saveY), "natural");
 		}
 	}
