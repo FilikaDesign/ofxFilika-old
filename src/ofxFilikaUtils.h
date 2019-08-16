@@ -110,15 +110,15 @@ public:
 	}
     #endif
     
-    string calculateTime(float gameTimeSeconds, float currentTimeSec) {
+    string calculateTime(float _time) {
         
         int seconds;
         int minutes;
         int mins_left;
         int secs_left;
         
-        seconds = (gameTimeSeconds - int(currentTimeSec));
-        minutes = (gameTimeSeconds - int(currentTimeSec)) / SECS_PER_MIN;
+        seconds = (/*gameTimeSeconds - */int(_time));
+        minutes = (/*gameTimeSeconds - */int(_time)) / SECS_PER_MIN;
         mins_left = minutes % SECS_PER_MIN;
         secs_left = seconds % SECS_PER_MIN;
         
@@ -146,8 +146,8 @@ public:
             return "00:00";
         else
             return (mins + ":" + secs);
-        //return ofToString(seconds);
     }
+
 
 	/* STRING OPERATIONS */
 	/* Save ofxFilikaUtils.h file as unicode-(without signature) */

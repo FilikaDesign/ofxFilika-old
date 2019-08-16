@@ -401,8 +401,8 @@ class ofxFilikaHapPlayer
                     // Passed and remaining time
                     ofPushStyle();
                     float passedTime = ofMap(player[currentVid]->getPosition(), 0, 1, 0, player[currentVid]->getDuration());
-                    string remainingTime = utils.calculateTime(player[currentVid]->getDuration(), passedTime);
-                    string totalTime = utils.calculateTime(player[currentVid]->getDuration(), 0);
+                    string remainingTime = utils.calculateTime(player[currentVid]->getDuration() - passedTime);
+                    string totalTime = utils.calculateTime(player[currentVid]->getDuration());
                     //ofBitmapFont f;
                     
                     ofRectangle rectPassedTime = ff.getStringBoundingBox(remainingTime + " / " + totalTime,0,0);
