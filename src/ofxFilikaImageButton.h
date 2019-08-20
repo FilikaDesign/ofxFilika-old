@@ -189,7 +189,8 @@ public:
 	ofxFilikaImageButton() {
 		bId = 0;
 		isSelected = false;
-		_bgOpacity = 255;
+		_bgOpacity = 255; 
+		
 	}
 
 	// deconstructer
@@ -201,7 +202,7 @@ public:
 	// SETUP
 	////////////////////////////////////////////////
 	void setup(string _imgPath, int _size, int _id, ofxFilikaBgMode _bgMode = IMAGE, ofVec2f _bgSize = ofVec2f(-1, -1), ofColor _mainColor = ofColor(0), bool _isAnimatable = true) {
-
+		isDown = false;
 		ofSetCircleResolution(64);
 
 		isPassiveMode = false;
@@ -381,7 +382,7 @@ public:
 
 	//--------------------------------------------------------------
 	void mouseExited(ofMouseEventArgs & args) {
-		hitReleasedOutside();
+		//hitReleasedOutside();
 	}
 	//--------------------------------------------------------------
 	void mouseMoved(ofMouseEventArgs & args) {

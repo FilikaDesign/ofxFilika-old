@@ -189,9 +189,9 @@ public:
 
 		// Change moving direction
 		if (_dir == "default")
-			moveAmty = scrollBarRect.y + ofMap(scrollerRect.y, scrollBarRect.y, maxYVal, scrollBarRect.y, scrollBarRect.y + content->getHeight() - scrollBarRect.height)*-1;
+			moveAmty = scrollBarRect.y + ofMap(scrollerRect.y, scrollBarRect.y, maxYVal, scrollBarRect.y, scrollBarRect.y + content->getHeight() - scrollBarRect.height + 20)*-1;
 		else
-			moveAmty = scrollBarRect.y + ofMap(scrollerRect.y, scrollBarRect.y + scrollBarRect.height, scrollBarRect.y, scrollBarRect.y + content->getHeight(), scrollBarRect.y)*-1;
+			moveAmty = scrollBarRect.y + ofMap(scrollerRect.y, maxYVal, scrollBarRect.y, scrollBarRect.y + content->getHeight() - scrollBarRect.height + 20, scrollBarRect.y)*-1;
 
 		updateContentFbo();
 	}
