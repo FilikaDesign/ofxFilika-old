@@ -94,7 +94,9 @@ public:
 	}
 
 	// deconstructer
-	~ofxFilikaTextButton() {}
+	~ofxFilikaTextButton() {
+		disableInteraction();
+	}
 
 
 	////////////////////////////////////////////////

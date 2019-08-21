@@ -97,6 +97,50 @@ class ofxFilikaHapPlayer
     
         bool isCoverImagesEnabled;
 	public:
+
+		void enableInteraction() {
+			// If navigation enabled
+			if (isNavEnabled) {
+				// Init Play/Pause button
+				if (srcPlay != "" || srcPause != "")
+				{
+					ofAddListener(btnPlayPause.BUTTON_TOUCH_UP, this, &ofxFilikaHapPlayer::onPlayPauseDown);
+					ofAddListener(btnPlayBig.BUTTON_TOUCH_UP, this, &ofxFilikaHapPlayer::onPlayBigDown);
+				}
+#ifdef TOUCH_ENABLE
+				ofAddListener(ofEvents().touchDown, this, &ofxFilikaHapPlayer::touchDown);
+				ofAddListener(ofEvents().touchUp, this, &ofxFilikaHapPlayer::touchUp);
+				ofAddListener(ofEvents().touchMoved, this, &ofxFilikaHapPlayer::touchMoved);
+#else
+				ofAddListener(ofEvents().mousePressed, this, &ofxFilikaHapPlayer::mousePressed);
+				ofAddListener(ofEvents().mouseReleased, this, &ofxFilikaHapPlayer::mouseReleased);
+				ofAddListener(ofEvents().mouseDragged, this, &ofxFilikaHapPlayer::mouseDragged);
+				ofAddListener(ofEvents().mouseMoved, this, &ofxFilikaHapPlayer::mouseMoved);
+#endif
+			}
+		}
+
+		void disableInteraction() {
+			// If navigation enabled
+			if (isNavEnabled) {
+				// Init Play/Pause button
+				if (srcPlay != "" || srcPause != "")
+				{
+					ofRemoveListener(btnPlayPause.BUTTON_TOUCH_UP, this, &ofxFilikaHapPlayer::onPlayPauseDown);
+					ofRemoveListener(btnPlayBig.BUTTON_TOUCH_UP, this, &ofxFilikaHapPlayer::onPlayBigDown);
+				}
+#ifdef TOUCH_ENABLE
+				ofRemoveListener(ofEvents().touchDown, this, &ofxFilikaHapPlayer::touchDown);
+				ofRemoveListener(ofEvents().touchUp, this, &ofxFilikaHapPlayer::touchUp);
+				ofRemoveListener(ofEvents().touchMoved, this, &ofxFilikaHapPlayer::touchMoved);
+#else
+				ofRemoveListener(ofEvents().mousePressed, this, &ofxFilikaHapPlayer::mousePressed);
+				ofRemoveListener(ofEvents().mouseReleased, this, &ofxFilikaHapPlayer::mouseReleased);
+				ofRemoveListener(ofEvents().mouseDragged, this, &ofxFilikaHapPlayer::mouseDragged);
+				ofRemoveListener(ofEvents().mouseMoved, this, &ofxFilikaHapPlayer::mouseMoved);
+#endif
+			}
+		}
     
 		~ofxFilikaHapPlayer() {
 			for (int i = 0; i < (int)dir.size(); i++) {

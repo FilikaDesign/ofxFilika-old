@@ -51,6 +51,14 @@ private:
 	}
 
 public:
+	ofxFilikaContentScroller() {
+
+	}
+
+	~ofxFilikaContentScroller() {
+		disableInteraction();
+	}
+
 	void enableInteraction() {
 		if (isScrollingEnabled) {
 #ifdef TOUCH_ENABLE

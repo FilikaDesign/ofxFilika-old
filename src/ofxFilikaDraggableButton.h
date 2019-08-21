@@ -231,7 +231,9 @@ public:
 	}
 
 	// deconstructer
-	~ofxFilikaDraggableButton() {}
+	~ofxFilikaDraggableButton() {
+		disableInteraction();
+	}
 
     ////////////////////////////////////////////////
     // SETUP

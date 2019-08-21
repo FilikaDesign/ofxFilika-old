@@ -194,7 +194,9 @@ public:
 	}
 
 	// deconstructer
-	~ofxFilikaImageButton() {}
+	~ofxFilikaImageButton() {
+		disableInteraction();
+	}
 
 
 
