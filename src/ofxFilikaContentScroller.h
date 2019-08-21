@@ -27,6 +27,7 @@ private:
 	glm::vec2 btnScrollDownPos;
 
 	bool isScrollBarVisible;
+	bool isScrollingEnabled;
 
 	int saveX, saveY, touchYScrollerPos;
 	int sbW;
@@ -51,47 +52,49 @@ private:
 
 public:
 	void enableInteraction() {
+		if (isScrollingEnabled) {
 #ifdef TOUCH_ENABLE
-		ofAddListener(ofEvents().touchMoved, this, &ofxFilikaContentScroller::touchMoveContentTouchHandler);
-		ofAddListener(ofEvents().touchDown, this, &ofxFilikaContentScroller::touchDownContentTouchHandler);
-		ofAddListener(ofEvents().touchUp, this, &ofxFilikaContentScroller::touchUpContentTouchHandler);
+			ofAddListener(ofEvents().touchMoved, this, &ofxFilikaContentScroller::touchMoveContentTouchHandler);
+			ofAddListener(ofEvents().touchDown, this, &ofxFilikaContentScroller::touchDownContentTouchHandler);
+			ofAddListener(ofEvents().touchUp, this, &ofxFilikaContentScroller::touchUpContentTouchHandler);
 #else
-		ofAddListener(ofEvents().mouseDragged, this, &ofxFilikaContentScroller::moveMouseContent);
-		ofAddListener(ofEvents().mousePressed, this, &ofxFilikaContentScroller::moveMouseContentPressed);
-		ofAddListener(ofEvents().mouseReleased, this, &ofxFilikaContentScroller::moveMouseContentReleased);
+			ofAddListener(ofEvents().mouseDragged, this, &ofxFilikaContentScroller::moveMouseContent);
+			ofAddListener(ofEvents().mousePressed, this, &ofxFilikaContentScroller::moveMouseContentPressed);
+			ofAddListener(ofEvents().mouseReleased, this, &ofxFilikaContentScroller::moveMouseContentReleased);
 #endif	
-		if (isScrollBarVisible)
-			ofAddListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
+			if (isScrollBarVisible)
+				ofAddListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
 
 
-		// Scroll Nav buttons enabled
-		if (isScrollNavEnable) {
-			ofAddListener(btnScrollUp.BUTTON_TOUCH_UP, this, &ofxFilikaContentScroller::moveContentUp);
-			ofAddListener(btnScrollDown.BUTTON_TOUCH_UP, this, &ofxFilikaContentScroller::moveContentDown);
+			// Scroll Nav buttons enabled
+			if (isScrollNavEnable) {
+				ofAddListener(btnScrollUp.BUTTON_TOUCH_UP, this, &ofxFilikaContentScroller::moveContentUp);
+				ofAddListener(btnScrollDown.BUTTON_TOUCH_UP, this, &ofxFilikaContentScroller::moveContentDown);
+			}
 		}
 	}
 
 	void disableInteraction() {
-
+		if (isScrollingEnabled) {
 #ifdef TOUCH_ENABLE
-		ofRemoveListener(ofEvents().touchMoved, this, &ofxFilikaContentScroller::touchMoveContentTouchHandler);
-		ofRemoveListener(ofEvents().touchDown, this, &ofxFilikaContentScroller::touchDownContentTouchHandler);
-		ofRemoveListener(ofEvents().touchUp, this, &ofxFilikaContentScroller::touchUpContentTouchHandler);
+			ofRemoveListener(ofEvents().touchMoved, this, &ofxFilikaContentScroller::touchMoveContentTouchHandler);
+			ofRemoveListener(ofEvents().touchDown, this, &ofxFilikaContentScroller::touchDownContentTouchHandler);
+			ofRemoveListener(ofEvents().touchUp, this, &ofxFilikaContentScroller::touchUpContentTouchHandler);
 #else
-		ofRemoveListener(ofEvents().mousePressed, this, &ofxFilikaContentScroller::moveMouseContentPressed);
-		ofRemoveListener(ofEvents().mouseDragged, this, &ofxFilikaContentScroller::moveMouseContent);
-		ofRemoveListener(ofEvents().mouseReleased, this, &ofxFilikaContentScroller::moveMouseContentReleased);
+			ofRemoveListener(ofEvents().mousePressed, this, &ofxFilikaContentScroller::moveMouseContentPressed);
+			ofRemoveListener(ofEvents().mouseDragged, this, &ofxFilikaContentScroller::moveMouseContent);
+			ofRemoveListener(ofEvents().mouseReleased, this, &ofxFilikaContentScroller::moveMouseContentReleased);
 #endif	
-		if (isScrollBarVisible)
-			ofRemoveListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
+			if (isScrollBarVisible)
+				ofRemoveListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
 
 
-		// Scroll Nav buttons enabled
-		if (isScrollNavEnable) {
-			ofRemoveListener(btnScrollUp.BUTTON_TOUCH_UP, this, &ofxFilikaContentScroller::moveContentUp);
-			ofRemoveListener(btnScrollDown.BUTTON_TOUCH_UP, this, &ofxFilikaContentScroller::moveContentDown);
+			// Scroll Nav buttons enabled
+			if (isScrollNavEnable) {
+				ofRemoveListener(btnScrollUp.BUTTON_TOUCH_UP, this, &ofxFilikaContentScroller::moveContentUp);
+				ofRemoveListener(btnScrollDown.BUTTON_TOUCH_UP, this, &ofxFilikaContentScroller::moveContentDown);
+			}
 		}
-
 	}
 
 
@@ -280,19 +283,18 @@ public:
 
 
 			isScrollBarVisible = true;
-
+			isScrollingEnabled = true;
 
 			ofAddListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
 		}
 		else {
 			isScrollBarVisible = false;
+			disableInteraction();
+			isScrollingEnabled = false;
 		}
 	}
 
-	void setPositionScrobber(int _y) {
-		//scrollerBtn.setPos();
-	}
-
+	
 	void setPositon(int _x, int _y) {
 		x = _x;
 		y = _y;
@@ -313,6 +315,15 @@ public:
 
 	void setScrollbarVisible(bool _v) {
 		isScrollBarVisible = _v;
+	}
+
+	void setScrollingEnable(bool _isScrollingEnabled) {
+		isScrollingEnabled = _isScrollingEnabled;
+
+		if (!isScrollingEnabled)
+			disableInteraction();
+		else
+			enableInteraction();
 	}
 
 	void setScrollbarW(int _v) {

@@ -4,7 +4,7 @@
 
 class ofxFilikaMultiTouchEvents {
 public:
-	ofEvent<ofxFilikaSwipeEvent> SWIPE_EVENT;
+	//ofEvent<ofxFilikaSwipeEvent> SWIPE_EVENT;
 };
 
 class ofxFilikaZoomEvent {
