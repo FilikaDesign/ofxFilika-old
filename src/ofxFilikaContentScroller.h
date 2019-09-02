@@ -70,9 +70,7 @@ public:
 			ofAddListener(ofEvents().mousePressed, this, &ofxFilikaContentScroller::moveMouseContentPressed);
 			ofAddListener(ofEvents().mouseReleased, this, &ofxFilikaContentScroller::moveMouseContentReleased);
 #endif	
-			if (isScrollBarVisible)
-				ofAddListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
-
+			ofAddListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
 
 			// Scroll Nav buttons enabled
 			if (isScrollNavEnable) {
@@ -93,8 +91,7 @@ public:
 			ofRemoveListener(ofEvents().mouseDragged, this, &ofxFilikaContentScroller::moveMouseContent);
 			ofRemoveListener(ofEvents().mouseReleased, this, &ofxFilikaContentScroller::moveMouseContentReleased);
 #endif	
-			if (isScrollBarVisible)
-				ofRemoveListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
+			ofRemoveListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
 
 
 			// Scroll Nav buttons enabled
@@ -286,14 +283,15 @@ public:
 			scrollerBtn.setDraggingVertical(true);
 			scrollerBtn.setInteractionArea(ofVec2f(scrollerRect.width + 40, scrollerRect.height));
 
-			if (isScrollBarVisible)
-				ofRemoveListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
-
+			if (!isScrollingEnabled) {
+				ofAddListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
+				
+			}
 
 			isScrollBarVisible = true;
 			isScrollingEnabled = true;
 
-			ofAddListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
+			enableInteraction();
 		}
 		else {
 			isScrollBarVisible = false;

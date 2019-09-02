@@ -17,11 +17,12 @@
 
 class ofxFilikaUtils {
 private:
-	ofXml xml;
+	
 	string xmlFile;
     ofBitmapFont bf;
     
 public:
+	ofXml xml;
     #ifdef WIN32
 	bool pingIpAdd(const char argv[], bool _verbose = false) {
 
