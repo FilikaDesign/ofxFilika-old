@@ -149,6 +149,16 @@ public:
             return (mins + ":" + secs);
     }
 
+	/* GL RELATED - GRAPHICS */
+	int getMaxTextureSize() {
+		GLint maxTexSize;
+		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
+
+		//cout << "Max texture size : " << maxTexSize << endl;
+
+		return maxTexSize;
+	}
+
 
 	/* STRING OPERATIONS */
 	/* Save ofxFilikaUtils.h file as unicode-(without signature) */
