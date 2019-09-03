@@ -2,6 +2,43 @@
 
 #include "ofMain.h"
 
+/* USAGE */
+/* Create a template class and extend this class to ofxFilikaInteractiveContainer as follows */
+/*
+class yourClassName : public ofxFilikaInteractiveContainer {
+	void setup() { 
+		// Override setup function
+		enableMouseEvents();	// to enable mouse events
+		enableTouchEvents();	// to enable touch events
+
+		// you should set your display object's screen coordinates and size
+		// otherwise interaction doesn't work.
+		this.x		= 100;
+		this.y		= 100;
+		this.width  = 200;
+		this.height = 200; 
+	}
+
+	void draw() {
+		// Override draw function
+		drawDebug();			// to enable screen debug view of your container
+	}
+
+	virtual void onPress(int x, int y, int button) {
+		//printf("MyTestObject::onPress(x: %i, y: %i, button: %i)\n", x, y, button);
+	}
+
+	virtual void onRelease(int x, int y, int button) {
+		//printf("MyTestObject::onRelease(x: %i, y: %i, button: %i)\n", x, y, button);
+	}
+
+	virtual void onReleaseOutside(int x, int y, int button) {
+		//printf("MyTestObject::onReleaseOutside(x: %i, y: %i, button: %i)\n", x, y, button);
+	}
+}
+
+*/
+
 class ofxFilikaInteractiveContainer : public ofRectangle {
 private:
 	bool isMouseEventsEnabled;
@@ -62,12 +99,12 @@ public:
 		string ss;
 		if (isMousePressed()) {
 			ofFill();
-			ofSetColor(0, 255, 0, 255);
+			ofSetColor(0, 255, 0, 100);
 			ss = "pointer pressed on object";
 		}
 		else if (isMouseOver()) {
 			ofFill();
-			ofSetColor(0, 255, 0, 100);
+			ofSetColor(255, 255, 0, 50);
 			ss = "pointer over on object";
 		}
 		else {
@@ -147,6 +184,104 @@ public:
 			int y = e.y;
 			int button = e.button;
 
+			_pointerMoved(x, y, button);
+		}
+
+
+		//--------------------------------------------------------------
+		void _mousePressed(ofMouseEventArgs &e) {
+			int x = e.x;
+			int y = e.y;
+			int button = e.button;
+
+			_pointerPressed(x, y, button);
+		}
+
+		//--------------------------------------------------------------
+		void _mouseDragged(ofMouseEventArgs &e) {
+			int x = e.x;
+			int y = e.y;
+			int button = e.button;
+
+			_pointerDragged(x, y, button);
+		}
+
+		//--------------------------------------------------------------
+		void _mouseReleased(ofMouseEventArgs &e) {
+			int x = e.x;
+			int y = e.y;
+			int button = e.button;
+
+			_pointerReleased(x, y, button);
+		}
+
+		void _touchDown(ofTouchEventArgs &e) {
+			int x = e.x;
+			int y = e.y;
+
+			_pointerPressed(x, y, 0);
+		}
+
+		void _touchUp(ofTouchEventArgs &e) {
+			int x = e.x;
+			int y = e.y;
+
+			_pointerReleased(x, y, 0);
+			_isMouseOver = false;
+		}
+
+		void _touchMoved(ofTouchEventArgs &e) {
+			int x = e.x;
+			int y = e.y;
+
+			_pointerDragged(x, y, 0);
+		}
+
+		void _pointerPressed(int x, int y, int bId) {
+			if (!isMouseEventsEnabled) {
+				_isMousePressed[bId] = false;
+				return;
+			}
+
+			if (hitTest(x, y)) {								 // if mouse is over
+				if (!isMousePressed(bId)) {						 // if wasn't down previous frame
+					_isMousePressed[bId] = true;				 // update flag
+					onPress(x, y, bId);					         // call onPress
+				}
+			}
+			else {												// if mouse is not over
+				_isMousePressed[bId] = false;					// update flag
+				onPressOutside(x, y, bId);
+			}
+
+			_stateChangeTimestampMillis = ofGetElapsedTimeMillis();
+
+			//mousePressed(x, y, button);
+		}
+
+
+		void _pointerReleased(int x, int y, int bId) {
+			if (!isMouseEventsEnabled) {
+				_isMousePressed[bId] = false;
+				return;
+			}
+
+			if (hitTest(x, y)) {
+				onRelease(x, y, bId);
+			}
+			else {
+				if (isMousePressed(bId))
+					onReleaseOutside(x, y, bId);
+			}
+			_isMousePressed[bId] = false;
+
+			_stateChangeTimestampMillis = ofGetElapsedTimeMillis();
+
+			//mouseReleased(x, y, button);
+		}
+
+
+		void _pointerMoved(int x, int y, int bId) {
 			if (!isMouseEventsEnabled) return;
 
 			if (hitTest(x, y)) {						// if mouse is over the object
@@ -166,42 +301,9 @@ public:
 			//mouseMoved(x, y);
 		}
 
-
-		//--------------------------------------------------------------
-		void _mousePressed(ofMouseEventArgs &e) {
-			int x = e.x;
-			int y = e.y;
-			int button = e.button;
-
+		void _pointerDragged(int x, int y, int bId) {
 			if (!isMouseEventsEnabled) {
-				_isMousePressed[button] = false;
-				return;
-			}
-
-			if (hitTest(x, y)) {									 // if mouse is over
-				if (!isMousePressed(button)) {						 // if wasn't down previous frame
-					_isMousePressed[button] = true;					 // update flag
-					onPress(x, y, button);					         // call onPress
-				}
-			}
-			else {													// if mouse is not over
-				_isMousePressed[button] = false;					// update flag
-				onPressOutside(x, y, button);
-			}
-
-			_stateChangeTimestampMillis = ofGetElapsedTimeMillis();
-
-			//mousePressed(x, y, button);
-		}
-
-		//--------------------------------------------------------------
-		void _mouseDragged(ofMouseEventArgs &e) {
-			int x = e.x;
-			int y = e.y;
-			int button = e.button;
-
-			if (!isMouseEventsEnabled) {
-				_isMousePressed[button] = false;
+				_isMousePressed[bId] = false;
 				return;
 			}
 
@@ -211,15 +313,15 @@ public:
 					_isMouseOver = true;					// update flag
 					onRollOver(x, y);						// call onRollOver
 				}
-				onDragOver(x, y, button);					// and trigger onDragOver
+				onDragOver(x, y, bId);					// and trigger onDragOver
 			}
 			else {
 				if (_isMouseOver) {							// if mouse is not over the object, but the flag is true (From previous frame)
 					onRollOut();							// call onRollOut
 					_isMouseOver = false;					// update flag
 				}
-				if (isMousePressed(button)) {
-					onDragOutside(x, y, button);
+				if (isMousePressed(bId)) {
+					onDragOutside(x, y, bId);
 				}
 				//_isMousePressed[button] = false;
 			}
@@ -227,42 +329,5 @@ public:
 			_stateChangeTimestampMillis = ofGetElapsedTimeMillis();
 
 			//mouseDragged(x, y, button);
-		}
-
-		//--------------------------------------------------------------
-		void _mouseReleased(ofMouseEventArgs &e) {
-			int x = e.x;
-			int y = e.y;
-			int button = e.button;
-
-			if (!isMouseEventsEnabled) {
-				_isMousePressed[button] = false;
-				return;
-			}
-
-			if (hitTest(x, y)) {
-				onRelease(x, y, button);
-			}
-			else {
-				if(isMousePressed(button))
-					onReleaseOutside(x, y, button);
-			}
-			_isMousePressed[button] = false;
-
-			_stateChangeTimestampMillis = ofGetElapsedTimeMillis();
-
-			//mouseReleased(x, y, button);
-		}
-
-		void _touchDown(ofTouchEventArgs &e) {
-
-		}
-
-		void _touchUp(ofTouchEventArgs &e) {
-
-		}
-
-		void _touchMoved(ofTouchEventArgs &e) {
-
 		}
 };
