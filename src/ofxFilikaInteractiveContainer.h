@@ -13,6 +13,8 @@ class yourClassName : public ofxFilikaInteractiveContainer {
 
 		// you should set your display object's screen coordinates and size
 		// otherwise interaction doesn't work.
+		// Keep in mind that objects are aligned according to top-left corner
+		// But, they are scaled and rotated from center of the container
 		this.x		= 100;
 		this.y		= 100;
 		this.width  = 200;
@@ -52,11 +54,17 @@ private:
 public:
 	//--------------------------------------------------------------
 	void enableInteraction() {
-		
+		enableTouchEvents();
+		enableMouseEvents();
+		isTouchEventsEnabled = true;
+		isMouseEventsEnabled = true;
 	}
 
 	void disableInteraction() {
-		
+		disableTouchEvents();
+		disableMouseEvents();
+		isTouchEventsEnabled = false;
+		isMouseEventsEnabled = false;
 	}
 
 	//--------------------------------------------------------------
@@ -135,9 +143,8 @@ public:
 		isMouseEnabled = false;
 		isTouchEnabled = false;
 		isTouchEventsEnabled = false;
-
-
-		enableMouseEvents();
+		isMouseEventsEnabled = false;
+		//enableMouseEvents();
 	}
 
 
