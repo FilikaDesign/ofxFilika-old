@@ -283,7 +283,7 @@ public:
 	////////////////////////////////////////////////
 	// SETUP
 	////////////////////////////////////////////////
-	void setup(string _imgPath, int _id, ofVec2f _bgSize = ofVec2f(-1, -1), ofColor _mainColor = ofColor(0), bool _isAnimatable = true) {
+	void setup(string _imgPath, int _id, glm::vec2 _bgSize = glm::vec2(-1, -1), ofColor _mainColor = ofColor(0), bool _isAnimatable = true) {
 
 		ofSetCircleResolution(64);
 
