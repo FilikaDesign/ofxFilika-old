@@ -5,7 +5,11 @@
 /* USAGE */
 /* Create a template class and extend this class to ofxFilikaInteractiveContainer as follows */
 /*
+#include "ofMain.h"
+#include "ofxFilikaInteractiveContainer.h"
+
 class yourClassName : public ofxFilikaInteractiveContainer {
+public:
 	void setup() { 
 		// Override setup function
 		enableMouseEvents();	// to enable mouse events
@@ -15,10 +19,10 @@ class yourClassName : public ofxFilikaInteractiveContainer {
 		// otherwise interaction doesn't work.
 		// Keep in mind that objects are aligned according to top-left corner
 		// But, they are scaled and rotated from center of the container
-		this.x		= 100;
-		this.y		= 100;
-		this.width  = 200;
-		this.height = 200; 
+		this->x = 100;
+		this->y = 100;
+		this->width = 200;
+		this->height = 200;
 	}
 
 	void draw() {
