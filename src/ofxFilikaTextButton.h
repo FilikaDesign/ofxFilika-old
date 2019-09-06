@@ -1,6 +1,6 @@
 #pragma once
 #include "ofMain.h"
-class ofxFilikaTextButton {
+class ofxFilikaTextButton :public ofRectangle {
 public:
 	ofEvent<int> BUTTON_CLICK;
 	ofEvent<int> BUTTON_TOUCH;
@@ -19,6 +19,8 @@ public:
 
 	ofTrueTypeFont* f;
 	ofTrueTypeFont* fBold;
+
+	bool isDebug;
 	////////////////////////////////////////////////
 	// SETTERS & GETTERS
 	////////////////////////////////////////////////
@@ -72,13 +74,18 @@ public:
 		fBold = _f2;
 	}
 
+	void setInteractionPadding(glm::vec2 _padding) {
+		this->width += _padding.x;
+		this->height += _padding.y;
+
+	}
 
 	ofColor getColor() {
 		return mainColor;
 	}
 
 	int getWidth() {
-		return size;
+		return this->width;
 	}
 
 
@@ -103,6 +110,7 @@ public:
 	// SETUP
 	////////////////////////////////////////////////
 	void setup(ofTrueTypeFont * _f, string _txt, ofColor _mainColor, int _btnSize, int _id = 0, bool _isAnimatable = true) {
+		isDebug = true;
 
 		txt	  = _txt;
 		
@@ -125,7 +133,9 @@ public:
 			Tweenzor::init();*/
 
 		wt = f->getStringBoundingBox(txt, 0, 0).getWidth();
-		ht = size;
+		ht = f->getStringBoundingBox("X", 0, 0).getHeight();
+
+		this->set(0,0,wt,ht);
 	}
 
 	////////////////////////////////////////////////
@@ -133,7 +143,9 @@ public:
 	////////////////////////////////////////////////
 	bool hit(int _x, int _y) {
 
-		result = (_x < xpos + wt * 0.5 && _x > xpos - wt * 0.5 && _y > ypos - size * 0.5 && _y < ypos + size * 0.5) ? true : false;
+		//result = (_x < xpos + wt * 0.5 && _x > xpos - wt * 0.5 && _y > ypos - size * 0.5 && _y < ypos + size * 0.5) ? true : false;
+
+		result = this->inside(glm::vec2(_x + this->width*0.5, _y + this->height*0.5));
 
 		return result;
 	}
@@ -146,11 +158,11 @@ public:
 		xpos = _x;
 		ypos = _y;
 
-		
-		
+		this->x = xpos;
+		this->y = ypos;
 
 		ofPushMatrix();
-		ofTranslate(_x, _y);
+		ofTranslate(this->x, this->y);
 
 		ofScale(scaleFac, scaleFac);
 
@@ -179,6 +191,13 @@ public:
 		ofPopStyle();
 		ofPopMatrix();
 
+		if (isDebug) {
+			ofPushStyle();
+			ofNoFill();
+			ofSetColor(255, 0, 0);
+			ofDrawRectangle(this->x - this->width * 0.5, this->y - this->height * 0.5, this->width, this->height);
+			ofPopStyle();
+		}
 	}
 
 
