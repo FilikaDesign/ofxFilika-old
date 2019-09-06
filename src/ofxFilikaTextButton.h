@@ -110,7 +110,7 @@ public:
 	// SETUP
 	////////////////////////////////////////////////
 	void setup(ofTrueTypeFont * _f, string _txt, ofColor _mainColor, int _btnSize, int _id = 0, bool _isAnimatable = true) {
-		isDebug = true;
+		isDebug = false;
 
 		txt	  = _txt;
 		
@@ -212,16 +212,12 @@ public:
 
 	//--------------------------------------------------------------
 	void touchMoved(ofTouchEventArgs & touch) {
-		hit(touch.x, touch.y);
-		if (!result) {
-			scaleFac = 1;
-			isDown = false;
-		}
+		
 	}
 
 	//--------------------------------------------------------------
 	void touchUp(ofTouchEventArgs & touch) {
-		hitReleased(touch.x, touch.y);
+		hitReleasedOutside(touch.x, touch.y);
 	}
 
 	//--------------------------------------------------------------
@@ -266,7 +262,7 @@ public:
 	//--------------------------------------------------------------
 	void mouseReleased(ofMouseEventArgs & args) {
 
-		hitReleased(args.x, args.y);
+		hitReleasedOutside(args.x, args.y);
 	}
 
 	////////////////////////////////////////////////
@@ -280,6 +276,17 @@ public:
 		}
 
 		if(!isSelected)
+			scaleFac = 1.0;
+	}
+
+	void hitReleasedOutside(float touch_x, float touch_y) {
+		hit(touch_x, touch_y);
+		if (isDown) {
+			ofNotifyEvent(BUTTON_TOUCH_UP, bId);
+			isDown = false;
+		}
+
+		if (!isSelected)
 			scaleFac = 1.0;
 	}
 
