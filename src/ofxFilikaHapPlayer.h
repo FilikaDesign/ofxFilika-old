@@ -107,16 +107,16 @@ class ofxFilikaHapPlayer
 					ofAddListener(btnPlayPause.BUTTON_TOUCH_UP, this, &ofxFilikaHapPlayer::onPlayPauseDown);
 					ofAddListener(btnPlayBig.BUTTON_TOUCH_UP, this, &ofxFilikaHapPlayer::onPlayBigDown);
 				}
-#ifdef TOUCH_ENABLE
+//#ifdef TOUCH_ENABLE
 				ofAddListener(ofEvents().touchDown, this, &ofxFilikaHapPlayer::touchDown);
 				ofAddListener(ofEvents().touchUp, this, &ofxFilikaHapPlayer::touchUp);
 				ofAddListener(ofEvents().touchMoved, this, &ofxFilikaHapPlayer::touchMoved);
-#else
+//#else
 				ofAddListener(ofEvents().mousePressed, this, &ofxFilikaHapPlayer::mousePressed);
 				ofAddListener(ofEvents().mouseReleased, this, &ofxFilikaHapPlayer::mouseReleased);
 				ofAddListener(ofEvents().mouseDragged, this, &ofxFilikaHapPlayer::mouseDragged);
 				ofAddListener(ofEvents().mouseMoved, this, &ofxFilikaHapPlayer::mouseMoved);
-#endif
+//#endif
 			}
 		}
 
@@ -129,16 +129,16 @@ class ofxFilikaHapPlayer
 					ofRemoveListener(btnPlayPause.BUTTON_TOUCH_UP, this, &ofxFilikaHapPlayer::onPlayPauseDown);
 					ofRemoveListener(btnPlayBig.BUTTON_TOUCH_UP, this, &ofxFilikaHapPlayer::onPlayBigDown);
 				}
-#ifdef TOUCH_ENABLE
+//#ifdef TOUCH_ENABLE
 				ofRemoveListener(ofEvents().touchDown, this, &ofxFilikaHapPlayer::touchDown);
 				ofRemoveListener(ofEvents().touchUp, this, &ofxFilikaHapPlayer::touchUp);
 				ofRemoveListener(ofEvents().touchMoved, this, &ofxFilikaHapPlayer::touchMoved);
-#else
+//#else
 				ofRemoveListener(ofEvents().mousePressed, this, &ofxFilikaHapPlayer::mousePressed);
 				ofRemoveListener(ofEvents().mouseReleased, this, &ofxFilikaHapPlayer::mouseReleased);
 				ofRemoveListener(ofEvents().mouseDragged, this, &ofxFilikaHapPlayer::mouseDragged);
 				ofRemoveListener(ofEvents().mouseMoved, this, &ofxFilikaHapPlayer::mouseMoved);
-#endif
+//#endif
 			}
 		}
     
@@ -336,16 +336,16 @@ class ofxFilikaHapPlayer
                     return;
                 }
                 
-#ifdef TOUCH_ENABLE
+//#ifdef TOUCH_ENABLE
                 ofAddListener(ofEvents().touchDown, this,  &ofxFilikaHapPlayer::touchDown);
                 ofAddListener(ofEvents().touchUp, this,  &ofxFilikaHapPlayer::touchUp);
                 ofAddListener(ofEvents().touchMoved, this, &ofxFilikaHapPlayer::touchMoved);
-#else
+//#else
                 ofAddListener(ofEvents().mousePressed, this,  &ofxFilikaHapPlayer::mousePressed);
                 ofAddListener(ofEvents().mouseReleased, this,  &ofxFilikaHapPlayer::mouseReleased);
                 ofAddListener(ofEvents().mouseDragged, this, &ofxFilikaHapPlayer::mouseDragged);
                 ofAddListener(ofEvents().mouseMoved, this, &ofxFilikaHapPlayer::mouseMoved);
-#endif
+//#endif
             }
 		}
     
@@ -501,7 +501,7 @@ private:
         return ofRectangle(navBarMargin + btnPW, ofGetWindowHeight() - navBarMargin - navBarH, ofGetWindowWidth() - (2 * navBarMargin) - btnPW, navBarH);
     }
     
-#ifdef TOUCH_ENABLE
+//#ifdef TOUCH_ENABLE
     void touchDown(ofTouchEventArgs & args) {
         pointerDown(glm::vec2(args.x, args.y));
     }
@@ -513,7 +513,7 @@ private:
     void touchMoved(ofTouchEventArgs & args) {
         pointerDragged(glm::vec2(args.x, args.y));
     }
-#else
+//#else
     void mousePressed(ofMouseEventArgs & args) {
         pointerDown(glm::vec2(args.x, args.y));
     }
@@ -532,7 +532,7 @@ private:
             lastMovement = ofGetSystemTimeMillis();
         }
     }
-#endif
+//#endif
     
     void pointerDown(glm::vec2 args) {
         ofRectangle bar = getBarRectangle();

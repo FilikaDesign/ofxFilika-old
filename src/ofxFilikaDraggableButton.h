@@ -247,14 +247,14 @@ public:
         isPassiveMode = false;
         sbRoundness   = 5;
        
-#ifdef TOUCH_ENABLE
+//#ifdef TOUCH_ENABLE
         ofRegisterTouchEvents(this);
 		isTouchEnabled = true;
-#else
+//#else
 		// register events for interaction
 		ofRegisterMouseEvents(this);
 		isMouseEnabled = true;
-#endif
+//#endif
         isEnabledInteraction = true;
         buttonMode = ofxFilikaButtonMode::BUTTON_MODE_SHAPE_ROUNRECT;
         
@@ -289,14 +289,14 @@ public:
 
 		isPassiveMode = false;
 
-#ifdef TOUCH_ENABLE
+//#ifdef TOUCH_ENABLE
 		ofRegisterTouchEvents(this);
 		isTouchEnabled = true;
-#else
+//#else
 		// register events for interaction
 		ofRegisterMouseEvents(this);
 		isMouseEnabled = true;
-#endif
+//#endif
 		isEnabledInteraction = true;
         buttonMode = ofxFilikaButtonMode::BUTTON_MODE_IMAGE;
 

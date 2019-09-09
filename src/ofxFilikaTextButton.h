@@ -116,14 +116,14 @@ public:
 		
 		f = _f;
 
-#ifdef TOUCH_ENABLE
+//#ifdef TOUCH_ENABLE
 		ofRegisterTouchEvents(this);
 		isTouchEnabled = true;
-#else
+//#else
 		// register events for interaction
 		ofRegisterMouseEvents(this);
 		isMouseEnabled = true;
-#endif
+//#endif
 		mainColor = _mainColor;
 		size = _btnSize;
 		bId = _id;

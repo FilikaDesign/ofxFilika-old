@@ -209,14 +209,14 @@ public:
 
 		isPassiveMode = false;
 
-#ifdef TOUCH_ENABLE
+//#ifdef TOUCH_ENABLE
 		ofRegisterTouchEvents(this);
 		isTouchEnabled = true;
-#else
+//#else
 		// register events for interaction
 		ofRegisterMouseEvents(this);
 		isMouseEnabled = true;
-#endif
+//#endif
 		isEnabledInteraction = true;
 		bgMode = _bgMode;
 		mainColor = _mainColor;

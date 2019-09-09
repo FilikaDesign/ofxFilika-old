@@ -61,15 +61,15 @@ public:
 
 	void enableInteraction() {
 		if (isScrollingEnabled) {
-#ifdef TOUCH_ENABLE
+//#ifdef TOUCH_ENABLE
 			ofAddListener(ofEvents().touchMoved, this, &ofxFilikaContentScroller::touchMoveContentTouchHandler);
 			ofAddListener(ofEvents().touchDown, this, &ofxFilikaContentScroller::touchDownContentTouchHandler);
 			ofAddListener(ofEvents().touchUp, this, &ofxFilikaContentScroller::touchUpContentTouchHandler);
-#else
+//#else
 			ofAddListener(ofEvents().mouseDragged, this, &ofxFilikaContentScroller::moveMouseContent);
 			ofAddListener(ofEvents().mousePressed, this, &ofxFilikaContentScroller::moveMouseContentPressed);
 			ofAddListener(ofEvents().mouseReleased, this, &ofxFilikaContentScroller::moveMouseContentReleased);
-#endif	
+//#endif	
 			ofAddListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
 
 			// Scroll Nav buttons enabled
@@ -82,15 +82,15 @@ public:
 
 	void disableInteraction() {
 		if (isScrollingEnabled) {
-#ifdef TOUCH_ENABLE
+//#ifdef TOUCH_ENABLE
 			ofRemoveListener(ofEvents().touchMoved, this, &ofxFilikaContentScroller::touchMoveContentTouchHandler);
 			ofRemoveListener(ofEvents().touchDown, this, &ofxFilikaContentScroller::touchDownContentTouchHandler);
 			ofRemoveListener(ofEvents().touchUp, this, &ofxFilikaContentScroller::touchUpContentTouchHandler);
-#else
+//#else
 			ofRemoveListener(ofEvents().mousePressed, this, &ofxFilikaContentScroller::moveMouseContentPressed);
 			ofRemoveListener(ofEvents().mouseDragged, this, &ofxFilikaContentScroller::moveMouseContent);
 			ofRemoveListener(ofEvents().mouseReleased, this, &ofxFilikaContentScroller::moveMouseContentReleased);
-#endif	
+///#endif	
 			ofRemoveListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaContentScroller::isDraggingHandler);
 
 
@@ -122,7 +122,7 @@ public:
 		enableInteraction();
 	}
 
-#ifdef TOUCH_ENABLE
+//#ifdef TOUCH_ENABLE
 	void touchMoveContentTouchHandler(ofTouchEventArgs  & e) {
 		pointerMove(glm::vec2(e.x, e.y));
 	}
@@ -135,7 +135,7 @@ public:
 		pointerUp(glm::vec2(e.x, e.y));
 	}
 
-#else
+//#else
 	void moveMouseContentPressed(ofMouseEventArgs & e) {
 		pointerDown(glm::vec2(e.x, e.y));
 	}
@@ -147,7 +147,7 @@ public:
 	void moveMouseContentReleased(ofMouseEventArgs & e) {
 		pointerUp(glm::vec2(e.x, e.y));
 	}
-#endif	
+//#endif	
 	void pointerDown(glm::vec2 e) {
 		if (this->inside(e)) {
 			//saveX = e.x - scrollerBtn.getPos().x;
