@@ -232,6 +232,11 @@ class ofxFilikaHapPlayer
             player[currentVid]->play();
         }
 
+		void setSize(int _w, int _h) {
+			vidW = _w;
+			vidH = _h;
+		}
+
 		void setup(string _settings, bool _autoPlay = false, bool _loadSound = false, bool _nav = false, bool _coverImages = false) {
 			
 			loadSound            = _loadSound;
@@ -462,10 +467,6 @@ class ofxFilikaHapPlayer
                     ofPopStyle();
                 }
             }
-            
-            
-            
-			
 		}
 
 		

@@ -81,7 +81,7 @@ public:
 		if (_alignment == CENTER) {
 			textPos.x = -textFont->getStringBoundingBox(_str, 0, 0).getWidth()*0.5;
 			if(_hTrFix == 0)
-				textPos.y = textFont->getStringBoundingBox(_str, 0, 0).getHeight()*0.5;
+				textPos.y = textFont->getStringBoundingBox("W", 0, 0).getHeight()*0.5;
 			else 
 				textPos.y = textFont->getStringBoundingBox("W", 0, 0).getHeight()*0.5 + _hTrFix;
 		}
@@ -181,6 +181,10 @@ public:
 
 	bool getIsEnabled() {
 		return isEnabledInteraction;
+	}
+
+	string getOverlayText() {
+		return textStr;
 	}
 
 	////////////////////////////////////////////////
