@@ -261,7 +261,7 @@ class ofxFilikaHapPlayer
             
             
             // If autoplay = false then show cover image for the video
-            if(!autoPlay)
+            if(!autoPlay && isCoverImagesEnabled)
                 showCover = true;
             
             if(isNavEnabled) {
@@ -339,8 +339,6 @@ class ofxFilikaHapPlayer
                     btnPlayBig.setButtonSize(150, 150);
                     
                     btnPlayPause.setButtonSize(navBarH + stW * 2, navBarH + stW * 2);
-                    
-                    
                 }else{
                     cout << "There is no play/pause button file data in XML file" << endl;
                     return;
@@ -401,6 +399,7 @@ class ofxFilikaHapPlayer
                     }
                 }else{
                     drawNavBar = true;
+					
                 }
                 
                 if(showCover && isCoverImagesEnabled) {
@@ -448,7 +447,7 @@ class ofxFilikaHapPlayer
                         //showCover = false;
                         btnPlayPause.setPassive(true);
                     }
-                    btnPlayPause.draw(navBarMargin, barFill.y + barFill.getHeight() * 0.5 - btnPlayPause.getHeight() * 0.5);
+                    btnPlayPause.draw(vidX + navBarMargin, barFill.y + barFill.getHeight() * 0.5 - btnPlayPause.getHeight() * 0.5);
                     
                     btnPW = btnPlayPause.getPos().x + btnPlayPause.getWidth() * 0.5;
                     
@@ -504,7 +503,7 @@ private:
 
     ofRectangle getBarRectangle() const
     {
-        return ofRectangle(navBarMargin + btnPW, ofGetWindowHeight() - navBarMargin - navBarH, ofGetWindowWidth() - (2 * navBarMargin) - btnPW, navBarH);
+        return ofRectangle(navBarMargin + btnPW, vidY + vidH - navBarMargin - navBarH, vidX + vidW - (2 * navBarMargin) - btnPW, navBarH);
     }
     
 //#ifdef TOUCH_ENABLE
