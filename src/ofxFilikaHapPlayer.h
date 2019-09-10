@@ -232,6 +232,10 @@ class ofxFilikaHapPlayer
             player[currentVid]->play();
         }
 
+		void loadVideoByName(string _src) {
+			player[currentVid]->load(_src);
+		}
+
 		void setSize(int _w, int _h) {
 			vidW = _w;
 			vidH = _h;
@@ -323,8 +327,16 @@ class ofxFilikaHapPlayer
 			}
 
 			// Load a movie file
-			parsePlaylistFolder();
-            
+			if (vidFolder != "")
+			{
+				parsePlaylistFolder();
+			}
+			else {
+				ofLog() << "switch to single player mode";
+				player.resize(1);
+				player[0] = new ofxHapPlayer();
+				currentVid = 0;
+			}
             // If navigation enabled
             if(isNavEnabled) {
                 // Init Play/Pause button
