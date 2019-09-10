@@ -237,6 +237,11 @@ class ofxFilikaHapPlayer
 			vidH = _h;
 		}
 
+		void setPlayerPosition(int _xpos, int _ypos) {
+			vidX = _xpos;
+			vidY = _ypos;
+		}
+
 		void setup(string _settings, bool _autoPlay = false, bool _loadSound = false, bool _nav = false, bool _coverImages = false) {
 			
 			loadSound            = _loadSound;
