@@ -183,6 +183,14 @@ class ofxFilikaHapPlayer
                     drawNavBar = true;
             }
         }
+
+		void setVidBarStrokeColor(ofColor _col) {
+			vidBarStrokeColor = _col;
+		}
+
+		void setVidBarFillColor(ofColor _col) {
+			vidBarFillColor = _col;
+		}
     
         /*void setPlayPauseBtnImages(string _playBtnSrc, string _pauseBtnSrc) {
             
@@ -193,6 +201,13 @@ class ofxFilikaHapPlayer
 			player[currentVid]->setPaused(true);
 			if(loadSound)
 				sounds[currentVid].setPaused(true);
+		}
+
+		/* Stop Player */
+		void stop() {
+			player[currentVid]->stop();
+			if (loadSound)
+				sounds[currentVid].stop();
 		}
     
         /* Goto position pct % */
@@ -334,6 +349,7 @@ class ofxFilikaHapPlayer
 			else {
 				ofLog() << "switch to single player mode";
 				player.resize(1);
+				sounds.resize(1);
 				player[0] = new ofxHapPlayer();
 				currentVid = 0;
 			}
