@@ -251,6 +251,13 @@ class ofxFilikaHapPlayer
 			player[currentVid]->load(_src);
 		}
 
+		void loadSoundByName(string _src) {
+			loadSound = true;
+			sounds[currentVid].load(_src);
+			sounds[currentVid].setLoop(true);
+			sounds[currentVid].play();
+		}
+
 		void setSize(int _w, int _h) {
 			vidW = _w;
 			vidH = _h;
