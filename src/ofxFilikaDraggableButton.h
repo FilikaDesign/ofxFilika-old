@@ -501,7 +501,7 @@ public:
 				xpos = _x - saveX;
 			}
 			ofVec2f p = ofVec2f(xpos, ypos);
-			ofNotifyEvent(BUTTON_DRAGGING, p);
+			ofNotifyEvent(BUTTON_DRAGGING, p, this);
         }
     }
     ////////////////////////////////////////////////
@@ -518,12 +518,12 @@ public:
             
             //if (isAnimatable)
             targetScale = _scaleMinVal;
-            isDown = true;
-            ofNotifyEvent(BUTTON_TOUCH_DOWN, bId);
             
+            ofNotifyEvent(BUTTON_TOUCH_DOWN, bId, this);
+			isDown = true;
             mainColor = _PRESS_COLOR;
             
-            //cout << "isDown " << isDown << endl;
+            cout << "isDown draggable " << isDown << endl;
         }
     }
     
@@ -537,7 +537,7 @@ public:
 			if (isDown)
 			{
 				targetScale = _scaleMaxVal;
-				ofNotifyEvent(BUTTON_TOUCH_UP, bId);
+				ofNotifyEvent(BUTTON_TOUCH_UP, bId, this);
 				isDown = false;
                 
                 mainColor = _OUT_COLOR;
@@ -553,10 +553,11 @@ public:
 		if (isDown)
 		{
 			targetScale = _scaleMaxVal;
-			ofNotifyEvent(BUTTON_TOUCH_UP, bId);
+			
 			isDown = false;
 			//cout << "outside " << isDown << endl;
             mainColor = _OUT_COLOR;
+			ofNotifyEvent(BUTTON_TOUCH_UP, bId, this);
 		}
 	}
 
@@ -590,6 +591,7 @@ public:
 			
 			if(isTouchEnabled)
 				ofUnregisterTouchEvents(this);
+
 			isEnabledInteraction = false;
 		}
 	}
@@ -604,6 +606,7 @@ public:
 
 			if (isTouchEnabled)
 				ofRegisterTouchEvents(this);
+
 			isEnabledInteraction = true;
 		}
 		

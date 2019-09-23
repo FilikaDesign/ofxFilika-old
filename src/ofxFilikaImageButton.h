@@ -441,7 +441,7 @@ public:
 			isDown = true;
 			ofNotifyEvent(BUTTON_TOUCH_DOWN, bId);
 
-			cout << "isDown " << isDown << endl;
+			//cout << "isDown " << isDown << endl;
 		}
 	}
 
@@ -452,7 +452,7 @@ public:
 			targetScale = 1.0;
 			ofNotifyEvent(BUTTON_TOUCH_UP, bId);
 			isDown = false;
-			cout << "outside " << isDown << endl;
+			//cout << "outside " << isDown << endl;
 		}
 	}
 

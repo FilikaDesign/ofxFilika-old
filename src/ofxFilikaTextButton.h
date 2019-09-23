@@ -109,12 +109,12 @@ public:
 	////////////////////////////////////////////////
 	// SETUP
 	////////////////////////////////////////////////
-	void setup(ofTrueTypeFont * _f, string _txt, ofColor _mainColor, int _btnSize, int _id = 0, bool _isAnimatable = true) {
+	void setup(ofTrueTypeFont & _f, string _txt, ofColor _mainColor, int _btnSize, int _id = 0, bool _isAnimatable = true) {
 		isDebug = false;
 
 		txt	  = _txt;
 		
-		f = _f;
+		f = &_f;
 
 //#ifdef TOUCH_ENABLE
 		ofRegisterTouchEvents(this);
