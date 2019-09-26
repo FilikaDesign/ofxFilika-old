@@ -523,7 +523,7 @@ public:
 			isDown = true;
             mainColor = _PRESS_COLOR;
             
-            cout << "isDown draggable " << isDown << endl;
+            //cout << "isDown draggable " << isDown << endl;
         }
     }
     

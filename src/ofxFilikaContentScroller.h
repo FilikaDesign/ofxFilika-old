@@ -103,7 +103,7 @@ public:
 	}
 
 
-	void setup(ofRectangle _contentRect, ofBaseDraws * _content = nullptr, int _sbGap = 1) {
+	void setup(ofRectangle _contentRect = ofRectangle(0, 0, 0, 0), ofBaseDraws * _content = nullptr, int _sbGap = 1) {
 		this->set(_contentRect);
 		isPointerDown = false;
 

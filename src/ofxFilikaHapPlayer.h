@@ -247,6 +247,11 @@ class ofxFilikaHapPlayer
             player[currentVid]->play();
         }
 
+		void loadCoverImageByName(string _src) {
+			isCoverImagesEnabled = true;
+			coverImages[currentVid].load(_src);
+		}
+
 		void loadVideoByName(string _src) {
 			player[currentVid]->load(_src);
 		}
@@ -357,6 +362,7 @@ class ofxFilikaHapPlayer
 				ofLog() << "switch to single player mode";
 				player.resize(1);
 				sounds.resize(1);
+				coverImages.resize(1);
 				player[0] = new ofxHapPlayer();
 				currentVid = 0;
 			}
