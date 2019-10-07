@@ -29,6 +29,7 @@ typedef enum  {
 	CUSTOM,
 	RECTANGLE,
 	ELLIPSE,
+	ROUNDRECT,
 	IMAGE
 } ofxFilikaBgMode;
 

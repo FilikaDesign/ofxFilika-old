@@ -195,7 +195,14 @@ class ofxFilikaHapPlayer
         /*void setPlayPauseBtnImages(string _playBtnSrc, string _pauseBtnSrc) {
             
         }*/
-    
+		
+		void setCoverImageFromVidFramePct(float _pct) {
+			setPosition(_pct);
+			setPlayVideo();
+			setPauseVideo();
+			setPosition(0);
+		}
+
         /* Pause Video */
 		void setPauseVideo() {
 			player[currentVid]->setPaused(true);
@@ -254,13 +261,22 @@ class ofxFilikaHapPlayer
 
 		void loadVideoByName(string _src) {
 			player[currentVid]->load(_src);
+
+			if (autoPlay)
+				player[currentVid]->play();
+			else
+				player[currentVid]->stop();
 		}
 
 		void loadSoundByName(string _src) {
 			loadSound = true;
 			sounds[currentVid].load(_src);
 			sounds[currentVid].setLoop(true);
-			sounds[currentVid].play();
+
+			if(autoPlay)
+				sounds[currentVid].play();
+			else
+				sounds[currentVid].stop();
 		}
 
 		void setSize(int _w, int _h) {
@@ -694,6 +710,8 @@ private:
                 
                 if (autoPlay)
                     sounds[currentVid].play();
+				else
+					sounds[currentVid].stop();
             }
             else {
                 cout << "Check " << soundFolder << " folder name..." << endl;

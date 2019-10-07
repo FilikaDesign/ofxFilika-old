@@ -39,6 +39,7 @@ private:
 	string textStr;
 	ofColor textColor;
 	glm::vec2 textPos;
+	int s1, s2, s3, s4;
 public:
 	ofEvent<int> BUTTON_TOUCH_DOWN;
 	ofEvent<int> BUTTON_TOUCH_UP;
@@ -68,6 +69,13 @@ public:
 		}
 			
 	}*/
+	void setCornerRadius(int _s1, int _s2, int _s3, int _s4) {
+		s1 = _s1;
+		s2 = _s2;
+		s3 = _s3;
+		s4 = _s4;
+	}
+
 	void setOverlayFont(ofTrueTypeFont * _f, string _str, glm::vec2 _textPos, ofColor _textColor) {
 		textFont = _f;
 		textStr = _str;
@@ -100,8 +108,7 @@ public:
 				isMouseEnabled = false;
 				ofUnregisterMouseEvents(this);
 			}
-		}
-		else {
+		} else {
 			ofUnregisterTouchEvents(this);
 			if (!isMouseEnabled) {
 				isMouseEnabled = true;
@@ -124,6 +131,10 @@ public:
 		ypos = _y;
 	}
 
+	void setBackgroundColor(ofColor _cl) {
+		mainColor = _cl;
+	}
+
 	void setBackgroundShape(int _mode = 0) {
 		bgMode = _mode;
 	}
@@ -142,8 +153,7 @@ public:
 			pivotPoint.x = getWidth() * 0.5;
 			pivotPoint.y = getHeight() * 0.5;
 			pivot = ofxFilikaAlignment::CENTER;
-		}
-		else if (_pivot == "tl") {
+		} else if (_pivot == "tl") {
 			pivotPoint.x = 0;
 			pivotPoint.y = 0;
 			pivot = ofxFilikaAlignment::TOP_LEFT;
@@ -208,6 +218,12 @@ public:
 	// SETUP
 	////////////////////////////////////////////////
 	void setup(string _imgPath, int _size, int _id, ofxFilikaBgMode _bgMode = IMAGE, ofVec2f _bgSize = ofVec2f(-1, -1), ofColor _mainColor = ofColor(0), bool _isAnimatable = true) {
+		
+		s1 = 0;
+		s2 = 0;
+		s3 = 0;
+		s4 = 0;
+
 		isDown = false;
 		ofSetCircleResolution(64);
 
@@ -282,6 +298,12 @@ public:
 		}
 
 
+		if (bgSize.x != -1 && imgPath != "")
+		{
+			_w = bgSize.x;
+			_h = bgSize.y;
+		}
+
 		setPivot("center");
 		pivot = ofxFilikaAlignment::CENTER;
 	}
@@ -314,6 +336,12 @@ public:
 			ofPushMatrix();
 			ofSetColor(mainColor);
 			ofDrawRectangle(-bgSize.x*0.5, -bgSize.y*0.5, bgSize.x, bgSize.y);
+			ofPopMatrix();
+		}
+		else if (bgMode == ofxFilikaBgMode::ROUNDRECT) { // Set background color and shape RECTANGLE
+			ofPushMatrix();
+			ofSetColor(mainColor);
+			ofDrawRectRounded(ofRectangle(-bgSize.x*0.5, -bgSize.y*0.5, bgSize.x, bgSize.y), s1, s2, s3, s4);
 			ofPopMatrix();
 		}
 		else if (bgMode == ofxFilikaBgMode::ELLIPSE) { // Set background color and shape ELLIPSE
