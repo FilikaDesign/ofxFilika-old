@@ -159,17 +159,37 @@ class ofxFilikaHapPlayer
 
 		void setSpeed(float _s,int _i) {
 			player[_i]->setSpeed(_s);
+
+			if (loadSound) {
+				sounds[_i].setSpeed(_s);
+			}
 		}
 
 		void setVolume(float _v, int _i) {
+			
 			player[_i]->setVolume(_v);
+
+			if (loadSound) {
+				sounds[_i].setVolume(_v);
+			}
 		}
 
 		void setLoop(bool _b,int _i) {
-			if (_b)
+		
+			if (_b) {
 				player[_i]->setLoopState(OF_LOOP_NORMAL);
-			else
+
+				if (loadSound) {
+					sounds[_i].setLoop(_b);
+				}
+			}
+			else {
 				player[_i]->setLoopState(OF_LOOP_NONE);
+				if (loadSound) {
+					sounds[_i].setLoop(_b);
+				}
+			}
+			
 		}
     
         void setNavBarAutoHide(bool _autoHide, float _autoHideThres = 3000) {
@@ -261,6 +281,7 @@ class ofxFilikaHapPlayer
 
 		void loadVideoByName(string _src) {
 			player[currentVid]->load(_src);
+			
 
 			if (autoPlay)
 				player[currentVid]->play();
@@ -271,7 +292,6 @@ class ofxFilikaHapPlayer
 		void loadSoundByName(string _src) {
 			loadSound = true;
 			sounds[currentVid].load(_src);
-			sounds[currentVid].setLoop(true);
 
 			if(autoPlay)
 				sounds[currentVid].play();
@@ -376,11 +396,20 @@ class ofxFilikaHapPlayer
 			}
 			else {
 				ofLog() << "switch to single player mode";
+				player.clear();
+				sounds.clear();
+				coverImages.clear();
 				player.resize(1);
 				sounds.resize(1);
 				coverImages.resize(1);
 				player[0] = new ofxHapPlayer();
+
 				currentVid = 0;
+				setLoop(vidIsLooping, currentVid);
+				setVolume(vidVolume, currentVid);
+				setSpeed(vidSpeed, currentVid);
+
+				
 			}
             // If navigation enabled
             if(isNavEnabled) {
@@ -553,6 +582,10 @@ private:
     void onPlayBigDown(int & _id) {
         
 		if (isCoverImagesEnabled) {
+			if (loadSound) {
+				sounds[currentVid].play();
+			}
+
 			player[currentVid]->play();
 			showCover = false;
 		}
