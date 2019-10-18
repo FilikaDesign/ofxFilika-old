@@ -212,7 +212,7 @@ public:
 
 	//--------------------------------------------------------------
 	void touchMoved(ofTouchEventArgs & touch) {
-		
+		hit(touch.x, touch.y);
 	}
 
 	//--------------------------------------------------------------
@@ -226,7 +226,7 @@ public:
 
 	//--------------------------------------------------------------
 	void touchCancelled(ofTouchEventArgs & touch) {
-		result = false;
+		
 	}
 
 
@@ -311,11 +311,9 @@ public:
 	////////////////////////////////////////////////
 	void disableInteraction() {
 		if (isEnabledInteraction) {
-			if (isMouseEnabled)
-				ofUnregisterMouseEvents(this);
-
-			if (isTouchEnabled)
-				ofUnregisterTouchEvents(this);
+			ofUnregisterMouseEvents(this);
+			ofUnregisterTouchEvents(this);
+				
 			isEnabledInteraction = false;
 		}
 	}
@@ -325,11 +323,9 @@ public:
 	////////////////////////////////////////////////
 	void enableInteraction() {
 		if (!isEnabledInteraction) {
-			if (isMouseEnabled)
-				ofRegisterMouseEvents(this);
-
-			if (isTouchEnabled)
-				ofRegisterTouchEvents(this);
+			ofRegisterMouseEvents(this);
+			ofRegisterTouchEvents(this);
+		
 			isEnabledInteraction = true;
 		}
 

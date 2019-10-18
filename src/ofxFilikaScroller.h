@@ -58,15 +58,13 @@ public:
 
 	void enableInteraction() {
 		if (isScrollingEnabled) {
-#ifdef TOUCH_ENABLE
 			ofAddListener(ofEvents().touchMoved, this, &ofxFilikaScroller::touchMoveContentTouchHandler);
 			ofAddListener(ofEvents().touchDown, this, &ofxFilikaScroller::touchDownContentTouchHandler);
 			ofAddListener(ofEvents().touchUp, this, &ofxFilikaScroller::touchUpContentTouchHandler);
-#else
 			ofAddListener(ofEvents().mouseDragged, this, &ofxFilikaScroller::moveMouseContent);
 			ofAddListener(ofEvents().mousePressed, this, &ofxFilikaScroller::moveMouseContentPressed);
 			ofAddListener(ofEvents().mouseReleased, this, &ofxFilikaScroller::moveMouseContentReleased);
-#endif	
+		
 			if (isScrollBarVisible)
 				ofAddListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaScroller::isDraggingHandler);
 
@@ -82,15 +80,12 @@ public:
 	void disableInteraction() {
 		if (isScrollingEnabled) {
 
-#ifdef TOUCH_ENABLE
 			ofRemoveListener(ofEvents().touchMoved, this, &ofxFilikaScroller::touchMoveContentTouchHandler);
 			ofRemoveListener(ofEvents().touchDown, this, &ofxFilikaScroller::touchDownContentTouchHandler);
 			ofRemoveListener(ofEvents().touchUp, this, &ofxFilikaScroller::touchUpContentTouchHandler);
-#else
 			ofRemoveListener(ofEvents().mousePressed, this, &ofxFilikaScroller::moveMouseContentPressed);
 			ofRemoveListener(ofEvents().mouseDragged, this, &ofxFilikaScroller::moveMouseContent);
 			ofRemoveListener(ofEvents().mouseReleased, this, &ofxFilikaScroller::moveMouseContentReleased);
-#endif	
 			if (isScrollBarVisible)
 				ofRemoveListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaScroller::isDraggingHandler);
 
@@ -125,7 +120,6 @@ public:
 		ofAddListener(scrollerBtn.BUTTON_DRAGGING, this, &ofxFilikaScroller::isDraggingHandler);
 	}
 
-#ifdef TOUCH_ENABLE
 	void touchMoveContentTouchHandler(ofTouchEventArgs  & e) {
 		pointerMove(glm::vec2(e.x, e.y));
 	}
@@ -138,7 +132,6 @@ public:
 		pointerUp(glm::vec2(e.x, e.y));
 	}
 
-#else
 	void moveMouseContentPressed(ofMouseEventArgs & e) {
 		pointerDown(glm::vec2(e.x, e.y));
 	}
@@ -150,7 +143,6 @@ public:
 	void moveMouseContentReleased(ofMouseEventArgs & e) {
 		pointerUp(glm::vec2(e.x, e.y));
 	}
-#endif	
 	void pointerDown(glm::vec2 e) {
 		if (scrollerMaskRect.inside(e)) {
 			//saveX = e.x - scrollerBtn.getPos().x;
@@ -298,6 +290,10 @@ public:
 		scrollerRect.y = scrollerContentRect.y;
 	}
 
+	void setPositionScrobberX(int _x) {
+		scrollerRect.x = scrollBarRect.x + _x;
+	}
+
 	void setPositon(int _x, int _y) {
 		scrollerMaskRect.x = _x;
 		scrollerMaskRect.y = _y;
@@ -307,7 +303,7 @@ public:
 		scrollBarRect.x = scrollerMaskRect.x + scrollerMaskRect.getWidth() + sbGap;
 		scrollBarRect.y = scrollerMaskRect.y;
 
-		scrollerRect.x = scrollBarRect.x;
+		scrollerRect.x = scrollBarRect.x ;
 	}
 
 	void setContentRect(ofRectangle & _r) {
@@ -325,6 +321,10 @@ public:
 	void setScrollbarW(int _v) {
 		scW = _v;
 		sbW = scW;
+	}
+
+	void setScrollerW(int _w) {
+		scW = _w;
 	}
 
 	void setScrollbarCornerRadius(int _v) {

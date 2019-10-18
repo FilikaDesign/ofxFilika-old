@@ -160,7 +160,7 @@ class ofxFilikaHapPlayer
 		void setSpeed(float _s,int _i) {
 			player[_i]->setSpeed(_s);
 
-			if (loadSound) {
+			if (loadSound  && sounds.size() > 0) {
 				sounds[_i].setSpeed(_s);
 			}
 		}
@@ -169,7 +169,7 @@ class ofxFilikaHapPlayer
 			
 			player[_i]->setVolume(_v);
 
-			if (loadSound) {
+			if (loadSound && sounds.size() > 0) {
 				sounds[_i].setVolume(_v);
 			}
 		}
@@ -179,13 +179,13 @@ class ofxFilikaHapPlayer
 			if (_b) {
 				player[_i]->setLoopState(OF_LOOP_NORMAL);
 
-				if (loadSound) {
+				if (loadSound  && sounds.size() > 0) {
 					sounds[_i].setLoop(_b);
 				}
 			}
 			else {
 				player[_i]->setLoopState(OF_LOOP_NONE);
-				if (loadSound) {
+				if (loadSound  && sounds.size() > 0) {
 					sounds[_i].setLoop(_b);
 				}
 			}
@@ -230,6 +230,13 @@ class ofxFilikaHapPlayer
 				sounds[currentVid].setPaused(true);
 		}
 
+		/* Play Video */
+		void setPlayVideo() {
+			player[currentVid]->play();
+			if (loadSound)
+				sounds[currentVid].play();
+		}
+
 		/* Stop Player */
 		void stop() {
 			player[currentVid]->stop();
@@ -244,12 +251,7 @@ class ofxFilikaHapPlayer
 				sounds[currentVid].setPosition(_pct);
 		}
     
-        /* Play Video */
-		void setPlayVideo() {
-			player[currentVid]->play();
-			if (loadSound)
-				sounds[currentVid].play();
-		}
+        
     
         /* Load Next Video in the queue */
         void loadNext() {
@@ -567,6 +569,8 @@ class ofxFilikaHapPlayer
 private:
     void onPlayPauseDown(int & _id) {
         
+
+
 		if (loadSound) {
 			sounds[currentVid].setPaused(!player[currentVid]->isPaused());
 		}
