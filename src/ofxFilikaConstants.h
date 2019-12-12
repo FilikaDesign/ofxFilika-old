@@ -1,5 +1,11 @@
 #pragma once
 /* TYPE DEFINITIONS */
+typedef enum {
+	SHIFT,
+	DEL,
+	ENTER
+} ofxFilikaKey;
+
 typedef enum { 
 	TR, 
 	ENG, 

@@ -45,6 +45,9 @@ private:
 
 	bool isScrollNavEnable;
 	bool isPointerDown;
+	float lastMoveYpos;
+	int dirY;
+	int moveAmountYFac;
 
 	void isDraggingHandler(ofVec2f & _p) {
 		moveContent(_p);
@@ -106,6 +109,7 @@ public:
 	void setup(ofRectangle _contentRect = ofRectangle(0, 0, 0, 0), ofBaseDraws * _content = nullptr, int _sbGap = 1) {
 		this->set(_contentRect);
 		isPointerDown = false;
+		moveAmountYFac = 15;
 
 		sbGap = _sbGap;
 		sbColor = ofColor(150, 150, 150, 60);
@@ -115,6 +119,7 @@ public:
 		scW = 15;
 		scH = 0;
 		moveAmty = 0;
+		lastMoveYpos = 0;
 
 		if (_content != nullptr)
 			setContent(_content);
@@ -151,19 +156,29 @@ public:
 	void pointerDown(glm::vec2 e) {
 		if (this->inside(e)) {
 			//saveX = e.x - scrollerBtn.getPos().x;
-			saveY = ofMap(e.y, scrollBarRect.y, scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y) - scrollerRect.y;
+			//saveY = ofMap(e.y, scrollBarRect.y, scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y) - scrollerRect.y;
+			saveY = e.y;
 			isPointerDown = true;
 		}
 	}
 
 	void pointerUp(glm::vec2 e) {
 		isPointerDown = false;
+		//lastMoveYpos = 0;
+		
 	}
 
 	void pointerMove(glm::vec2 e) {
 		if (isPointerDown && this->inside(e)) {
-			
-			moveContent(glm::vec2(0, ofMap(e.y, scrollBarRect.y, scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y) - saveY), "natural");
+			if (e.y - saveY < 0) {
+				dirY = -1;
+			}
+			else {
+				dirY = 1;
+			}
+			lastMoveYpos += (moveAmountYFac * dirY);
+			//moveContent(glm::vec2(0, ofMap(e.y, scrollBarRect.y, scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y + scrollBarRect.getHeight(), scrollBarRect.y) - saveY), "natural");
+			moveContent(glm::vec2(0, lastMoveYpos), "natural");
 		}
 	}
 
@@ -182,24 +197,50 @@ public:
 		int maxYVal = scrollBarRect.y + scrollBarRect.height - scrollerBtn.getHeight();
 
 		// Moves scroll button
-		scrollerRect.y = _p.y;
-
-
-		// Stop if the content reaches to top border
-		if (_p.y < scrollBarRect.y) {
-			scrollerRect.y = scrollBarRect.y;
-		}
-
-		// Stop, if the content reaches to end
-		if (_p.y > maxYVal) {
-			scrollerRect.y = maxYVal;
-		}
+		scrollerRect.y = _p.y ;
 
 		// Change moving direction
 		if (_dir == "default")
+		{
+			// Stop if the content reaches to top border
+			if (_p.y < scrollBarRect.y) {
+				scrollerRect.y = scrollBarRect.y;
+			}
+
+			// Stop, if the content reaches to end
+			if (_p.y > maxYVal) {
+				scrollerRect.y = maxYVal;
+			}
+
 			moveAmty = scrollBarRect.y + ofMap(scrollerRect.y, scrollBarRect.y, maxYVal, scrollBarRect.y, scrollBarRect.y + content->getHeight() - scrollBarRect.height + 20)*-1;
-		else
-			moveAmty = scrollBarRect.y + ofMap(scrollerRect.y, maxYVal, scrollBarRect.y, scrollBarRect.y + content->getHeight() - scrollBarRect.height + 20, scrollBarRect.y)*-1;
+		} else {
+			//moveAmty = scrollBarRect.y + ofMap(scrollerRect.y, maxYVal, scrollBarRect.y, scrollBarRect.y + content->getHeight() - scrollBarRect.height + 20, scrollBarRect.y)*-1;
+			moveAmty = lastMoveYpos;
+
+			// To stop content moving upwards
+			if (moveAmty < (content->getHeight() - scrollBarRect.height) * -1) {
+				moveAmty = (content->getHeight() - scrollBarRect.height) * -1;
+				lastMoveYpos = moveAmty;
+			}
+			// To stop content moving downwards
+			if (moveAmty > 0) {
+				moveAmty = 0;
+				lastMoveYpos = moveAmty;
+			}
+
+			scrollerRect.y = ofMap(moveAmty, (content->getHeight() - scrollBarRect.height) * -1, 0, maxYVal, scrollBarRect.y);
+
+			// Stop if the content reaches to top border
+			if (scrollerRect.y > scrollBarRect.y) {
+				//scrollerRect.y = scrollBarRect.y;
+			}
+
+			// Stop, if the content reaches to end
+			if (scrollerRect.y > maxYVal) {
+				//scrollerRect.y = maxYVal;
+			}
+		}
+		
 
 		updateContentFbo();
 	}

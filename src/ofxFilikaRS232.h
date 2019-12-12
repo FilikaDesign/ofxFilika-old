@@ -257,6 +257,11 @@ class ofxFilikaRS232
 
 		}
 
+		void getResponseEpson() {
+
+
+		}
+
 		void getResponseBenQ() {
 			
 			try
