@@ -10,6 +10,8 @@
 
 class yourClassName : public ofxFilikaInteractiveContainer {
 public:
+	float sFac;
+
 	void setup() { 
 		// Override setup function
 		enableMouseEvents();	// to enable mouse events
@@ -26,20 +28,30 @@ public:
 	}
 
 	void draw() {
+		ofPushMatrix();
+		ofTranslate(this->x + this->width * 0.5, this->y + this->height*0.5);
+		ofScale(1 + sFac, 1 + sFac);
+		ofTranslate(-this->width*0.5, -this->height*0.5);
+		ofDrawRectangle(0,0, width, height);
+		ofPopMatrix();
+
 		// Override draw function
 		drawDebug();			// to enable screen debug view of your container
 	}
 
 	virtual void onPress(int x, int y, int button) {
 		//printf("MyTestObject::onPress(x: %i, y: %i, button: %i)\n", x, y, button);
+		sFac = -0.1;
 	}
 
 	virtual void onRelease(int x, int y, int button) {
 		//printf("MyTestObject::onRelease(x: %i, y: %i, button: %i)\n", x, y, button);
+		sFac = 0;
 	}
 
 	virtual void onReleaseOutside(int x, int y, int button) {
 		//printf("MyTestObject::onReleaseOutside(x: %i, y: %i, button: %i)\n", x, y, button);
+		sFac = 0;
 	}
 }
 
@@ -56,12 +68,15 @@ private:
 	std::map<int, bool>    _isMousePressed;					 // is mouse down over the rect (for any given mouse button)
 	unsigned long		   _stateChangeTimestampMillis;
 public:
+	bool isInteractionEnabled;
+
 	//--------------------------------------------------------------
 	void enableInteraction() {
 		enableTouchEvents();
 		enableMouseEvents();
 		isTouchEventsEnabled = true;
 		isMouseEventsEnabled = true;
+		isInteractionEnabled = true;
 	}
 
 	void disableInteraction() {
@@ -69,6 +84,7 @@ public:
 		disableMouseEvents();
 		isTouchEventsEnabled = false;
 		isMouseEventsEnabled = false;
+		isInteractionEnabled = false;
 	}
 
 	//--------------------------------------------------------------

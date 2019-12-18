@@ -244,9 +244,9 @@ public:
 	};
     
     /* CONVERT UNICODE(TR) TO LATIN(EN) CHARS */
-    string convertToNonUnicodeText(string _str) {
+    string convertToNonUnicodeText(string _str, string _spaceChar = "_") {
         string tr []= {"ı","İ","ş","Ş","ğ","Ğ","ç","Ç","ö","Ö","ü","Ü"," "};
-        string en []= {"i","i","s","s","g","g","c","c","o","o","u","u","_"};
+        string en []= {"i","i","s","s","g","g","c","c","o","o","u","u",_spaceChar };
         
         int ko = sizeof(tr)/sizeof(string);
         
@@ -265,6 +265,14 @@ public:
         char *foo = (char*)(&_str);
         return foo;
     }
+
+	/* CONVERT String to const char argv[] 
+	const char* convertStringToConstChar(string _str) {
+		const char * foo;
+		foo = _str.c_str();
+
+		return foo;
+	}*/
     
 	/* XML Operations */
 	void loadXml(string _src) {

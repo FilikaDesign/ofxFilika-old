@@ -87,7 +87,10 @@ public:
 	int getWidth() {
 		return this->width;
 	}
-
+	void setText(string txt) {
+		this->txt = txt;
+		this->width = f->getStringBoundingBox(txt, 0, 0).getWidth();
+	}
 
 	string getTxt() {
 		return txt;
