@@ -408,6 +408,20 @@ public:
         
         ofDrawBitmapStringHighlight(fr, x, y);
     }
+    
+    ofTrueTypeFont & getTurkishFont(ofTrueTypeFont & font, string fontName, int fontSize) {
+        
+        ofTrueTypeFontSettings settings(fontName, fontSize);
+        
+        settings.antialiased = true;
+        settings.dpi = 72;
+        settings.addRange(ofUnicode::Latin);
+        settings.addRange(ofUnicode::LatinA);
+        settings.addRange(ofUnicode::Latin1Supplement);
+        font.load(settings);
+        
+        return font;
+    }
 
 	bool notifyPerSecond(float threshold) {
 		bool result = false;
