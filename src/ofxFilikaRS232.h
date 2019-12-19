@@ -259,7 +259,52 @@ class ofxFilikaRS232
 
 		void getResponseEpson() {
 
+			try
+			{
+				// Read all bytes from the device;
+				uint8_t buffer[1024];
 
+				while (device.available() > 0)
+				{
+					std::size_t sz = device.readBytes(buffer, 1024);
+
+					bool endofSerialResponse = false;
+
+					for (std::size_t i = 0; i < sz; ++i)
+					{
+						cout <<buffer[i] << endl;
+						response += buffer[i];
+						//response += ",";
+					}
+	
+
+					for (int i = 0; i < responses.size(); i++)
+					{
+						//string bName = xml.find("//root/RESPONSES/RESPONSE")[i].getValue();
+						//responses[i] = bName;
+						//if (responses[i] == splicedResponse) {
+						if (ofIsStringInString(response, responses[i])) {
+							string bName = xml.find("//root/RESPONSES/RESPONSE")[i].getAttribute("resp").getValue();
+							ofNotifyEvent(SERIAL_RECEIVED, bName);
+							//cout << bName << endl;
+							//cout << "Response: " << response << endl;
+							//response = "";
+
+							break;
+						}
+					}
+
+					//cout << "splicedResponse: " << splicedResponse << endl;
+
+
+
+
+				}
+			}
+			catch (const std::exception& exc)
+			{
+				ofLogError("ofApp::update") << exc.what();
+			}
 		}
 
 		void getResponseBenQ() {
@@ -458,7 +503,6 @@ class ofxFilikaRS232
 								}
 							}
 						}
-						
 					}
 				}
 			}

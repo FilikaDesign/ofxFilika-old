@@ -72,19 +72,25 @@ public:
 
 	//--------------------------------------------------------------
 	void enableInteraction() {
-		enableTouchEvents();
-		enableMouseEvents();
-		isTouchEventsEnabled = true;
-		isMouseEventsEnabled = true;
-		isInteractionEnabled = true;
+		if (!isInteractionEnabled)
+		{
+			enableTouchEvents();
+			enableMouseEvents();
+			isTouchEventsEnabled = true;
+			isMouseEventsEnabled = true;
+			isInteractionEnabled = true;
+		}
 	}
 
 	void disableInteraction() {
-		disableTouchEvents();
-		disableMouseEvents();
-		isTouchEventsEnabled = false;
-		isMouseEventsEnabled = false;
-		isInteractionEnabled = false;
+		if (isInteractionEnabled)
+		{
+			disableTouchEvents();
+			disableMouseEvents();
+			isTouchEventsEnabled = false;
+			isMouseEventsEnabled = false;
+			isInteractionEnabled = false;
+		}
 	}
 
 	//--------------------------------------------------------------
