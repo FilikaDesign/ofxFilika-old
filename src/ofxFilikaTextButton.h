@@ -313,12 +313,12 @@ public:
 	// DISABLE INTERACTION
 	////////////////////////////////////////////////
 	void disableInteraction() {
-		if (isEnabledInteraction) {
+		//if (isEnabledInteraction) {
 			ofUnregisterMouseEvents(this);
 			ofUnregisterTouchEvents(this);
 				
 			isEnabledInteraction = false;
-		}
+		//}
 	}
 
 	////////////////////////////////////////////////
