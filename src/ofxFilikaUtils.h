@@ -20,7 +20,7 @@ private:
 	
 	string xmlFile;
     ofBitmapFont bf;
-    
+    float nextEventSeconds = 0;
 public:
 	ofXml xml;
     #ifdef WIN32
@@ -419,5 +419,17 @@ public:
         font.load(settings);
         
         return font;
+    }
+    
+    bool notifyPerSecond(float sec) {
+        float now = ofGetElapsedTimef();
+        if(now > nextEventSeconds) {
+                // do something here that should only happen
+                // every sec seconds
+            nextEventSeconds = now + sec;
+            return true;
+        }else{
+            return false;
+        }
     }
 };
