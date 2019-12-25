@@ -406,6 +406,18 @@ public:
         
         ofDrawBitmapStringHighlight(fr, x, y);
     }
+    bool notifyPerSecond(float timePeriod) {
+        bool result = false;
+        float now = ofGetElapsedTimef();
+        if(now > nextEventSeconds) {
+                // do something here that should only happen
+                // every 3 seconds
+            nextEventSeconds = now + timePeriod;
+            result = true;
+        }
+        
+        return result;
+    }
     
     ofTrueTypeFont & getTurkishFont(ofTrueTypeFont & font, string fontName, int fontSize) {
         
