@@ -199,25 +199,28 @@ class ofxFilikaRS232
 				// Read all bytes from the device;
 				uint8_t buffer[1024];
 
+
 				while (device.available() > 0)
 				{
 					std::size_t sz = device.readBytes(buffer, 1024);
 
-					
+					int responseXMLLength = 39;
 
 					for (std::size_t i = 0; i < sz; ++i)
 					{
+						
 						response += "0x" + ofToUpper(ofToHex(buffer[i]));
-						if (i != sz - 1) {
+
+						if (response.length() < responseXMLLength) {
 							response += ",";
 						}
 					}
 
-					
-
+					//ofLog() << "resp size: " << response.length() << "response : " << response;
 					//response = "";
+
 					//so now lets search in the xml
-					int responseXMLLength = 39;
+					
 					if (response.length() >= responseXMLLength) {
 						for (int i = 0; i < responses.size(); i++)
 						{
@@ -232,8 +235,13 @@ class ofxFilikaRS232
 						response = "";
 
 					}
-					
-					
+					else {
+						if (ofToUpper(ofToHex(buffer[0])) != "AA") {
+							response = "";
+						}
+					}
+
+
 					/*
 					for (int i = 0; i < responses.size(); i++)
 					{
@@ -242,13 +250,14 @@ class ofxFilikaRS232
 						if (responses[i] == response) {
 							string bName = xml.find("//root/RESPONSES/RESPONSE")[i].getAttribute("resp").getValue();
 							ofNotifyEvent(SERIAL_RECEIVED, bName);
-							
+
 							break;
 						}
 					}
 					*/
-
 				}
+
+				
 			}
 			catch (const std::exception& exc)
 			{
@@ -272,25 +281,31 @@ class ofxFilikaRS232
 
 					for (std::size_t i = 0; i < sz; ++i)
 					{
-						cout <<buffer[i] << endl;
+						//cout <<buffer[i] << endl;
 						response += buffer[i];
 						//response += ",";
 					}
-	
+					
+					if(isDebug)
+						ofLog() << "EPSON response len : " << response.length() << " response: " << response;
 
-					for (int i = 0; i < responses.size(); i++)
-					{
-						//string bName = xml.find("//root/RESPONSES/RESPONSE")[i].getValue();
-						//responses[i] = bName;
-						//if (responses[i] == splicedResponse) {
-						if (ofIsStringInString(response, responses[i])) {
-							string bName = xml.find("//root/RESPONSES/RESPONSE")[i].getAttribute("resp").getValue();
-							ofNotifyEvent(SERIAL_RECEIVED, bName);
-							//cout << bName << endl;
-							//cout << "Response: " << response << endl;
-							//response = "";
+					int responseXMLLength = 6;
+					if (response.length() >= responseXMLLength) {
 
-							break;
+						for (int i = 0; i < responses.size(); i++)
+						{
+							//string bName = xml.find("//root/RESPONSES/RESPONSE")[i].getValue();
+							//responses[i] = bName;
+							//if (responses[i] == splicedResponse) {
+							if (ofIsStringInString(response, responses[i])) {
+								string bName = xml.find("//root/RESPONSES/RESPONSE")[i].getAttribute("resp").getValue();
+								ofNotifyEvent(SERIAL_RECEIVED, bName);
+								//cout << bName << endl;
+								//cout << "Response: " << response << endl;
+								response = "";
+
+								break;
+							}
 						}
 					}
 
