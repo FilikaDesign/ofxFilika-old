@@ -20,9 +20,7 @@ private:
 	
 	string xmlFile;
     ofBitmapFont bf;
-	bool isTimeSet;
-	float storedTime;
-
+    float nextEventSeconds = 0;
 public:
 	ofXml xml;
     #ifdef WIN32
@@ -408,6 +406,18 @@ public:
         
         ofDrawBitmapStringHighlight(fr, x, y);
     }
+    bool notifyPerSecond(float timePeriod) {
+        bool result = false;
+        float now = ofGetElapsedTimef();
+        if(now > nextEventSeconds) {
+                // do something here that should only happen
+                // every 3 seconds
+            nextEventSeconds = now + timePeriod;
+            result = true;
+        }
+        
+        return result;
+    }
     
     ofTrueTypeFont & getTurkishFont(ofTrueTypeFont & font, string fontName, int fontSize) {
         
@@ -422,24 +432,6 @@ public:
         
         return font;
     }
-
-	bool notifyPerSecond(float threshold) {
-		bool result = false;
-		if (!isTimeSet) {
-			storedTime = ofGetElapsedTimef();
-			isTimeSet = true;
-		}
-
-		if (ofGetElapsedTimef() - storedTime > threshold) {
-			isTimeSet = false;
-			result = true;
-		}
-		else {
-			result = false;
-		}
-
-		return result;
-	}
 
 	string ofxGetDateCompact()
 	{
