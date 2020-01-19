@@ -154,7 +154,7 @@ public:
 		GLint maxTexSize;
 		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
 
-		//cout << "Max texture size : " << maxTexSize << endl;
+		//ofLog() << "Max texture size : " << maxTexSize;
 
 		return maxTexSize;
 	}
