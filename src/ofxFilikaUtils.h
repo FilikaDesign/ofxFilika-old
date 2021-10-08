@@ -21,7 +21,12 @@ private:
 	string xmlFile;
     ofBitmapFont bf;
     float nextEventSeconds = 0;
+    ofFbo largeOffscreenImage;
+    int resX,resY;
+    string fName, fDest;
+    
 public:
+    bool isSaved;
 	ofXml xml;
     #ifdef WIN32
 	bool pingIpAdd(const char argv[], bool _verbose = false) {
@@ -148,7 +153,16 @@ public:
         else
             return (mins + ":" + secs);
     }
-
+    /* COLOR OPENRATIONS */
+    ofColor convertColorHexToRGB(int hexValue) {
+            ofColor rgbColor;
+            rgbColor.r = ((hexValue >> 16) & 0xFF) / 255.0;  // Extract the RR byte
+            rgbColor.g = ((hexValue >> 8) & 0xFF) / 255.0;   // Extract the GG byte
+            rgbColor.b = ((hexValue) & 0xFF) / 255.0;        // Extract the BB byte
+            
+            return rgbColor;
+    }
+    
 	/* GL RELATED - GRAPHICS */
 	int getMaxTextureSize() {
 		GLint maxTexSize;
@@ -158,8 +172,76 @@ public:
 
 		return maxTexSize;
 	}
+    
+    //--------------------------------------------------------------
+    /* IMAGE SAVE OPERATIONS */
+    // Not suitable for batch file recording!!!
+    //--------------------------------------------------------------
+    void saveImageBegin(int _resX, int _resY, string _fName="", string _fDest="", float ratioX = -1, float ratioY = -1) {
+        resX = _resX;
+        resY = _resY;
+        fName = _fName;
+        fDest = _fDest;
+        
+        if(fName == "" && fDest == "") {
+            fName = ofGetTimestampString() + ".jpg";
+        }
+        
+        if(fName == "" && fDest != "") {
+            
+            fName = fDest + "/" + ofGetTimestampString() + ".jpg";
+        }
+        
+        if(fName != "" && fDest != "") {
+            
+            fName = fDest + "/" + fName + ".png";
+        }
+        
+        if(!isSaved)
+        {
+            float rX = ratioX; // e.g 16
+            float rY = ratioY; // e.g 9
+            float total = rX + rY;
+            
+            ofLog() << "Maximum Texture Size: " << getMaxTextureSize();
+            ofLog() << "-----------------------------------------------------------";
+            ofLog() << "FILE SAVE START";
 
+            if(resX == 0 && resY == 0 && rX != -1 && rY != -1) {
+                resX = (rX / total) * (getMaxTextureSize()-1);
+                resY = (rY / total) * (getMaxTextureSize()-1);
+            }
 
+            largeOffscreenImage.clear();
+            largeOffscreenImage.allocate(resX, resY, GL_RGBA, 4);
+            
+            largeOffscreenImage.begin();
+            ofClear(0, 0);
+        }
+    }
+    
+    void saveImageEnd() {
+        
+        if(!isSaved)
+        {
+            ofRectangle bounds(0,0, ofGetWidth(), ofGetHeight());
+            ofRectangle target(0,0,resX,resY);
+            target.scaleTo(bounds);
+        
+            largeOffscreenImage.end();
+            
+            
+            ofPixels p;
+            largeOffscreenImage.readToPixels(p);
+            ofSaveImage(p, fName);
+            
+            ofLog() << "-----------------------------------------------------------";
+            ofLog() << "FILE SAVE END";
+            
+            isSaved = true;
+        }
+    }
+    
 	/* STRING OPERATIONS */
 	/* Save ofxFilikaUtils.h file as unicode-(without signature) */
 	string toUpperUTF8(string _txt) {
@@ -242,8 +324,9 @@ public:
 		while (ss >> word) ++word_count;
 		return word_count;
 	};
-    
+    //--------------------------------------------------------------
     /* CONVERT UNICODE(TR) TO LATIN(EN) CHARS */
+    //--------------------------------------------------------------
     string convertToNonUnicodeText(string _str, string _spaceChar = "_") {
         string tr []= {"ı","İ","ş","Ş","ğ","Ğ","ç","Ç","ö","Ö","ü","Ü"," "};
         string en []= {"i","i","s","s","g","g","c","c","o","o","u","u",_spaceChar };
@@ -419,8 +502,9 @@ public:
         return result;
     }
     
-    ofTrueTypeFont & getTurkishFont(ofTrueTypeFont & font, string fontName, int fontSize) {
+    ofTrueTypeFont getTurkishFont(string fontName, int fontSize) {
         
+        ofTrueTypeFont font;
         ofTrueTypeFontSettings settings(fontName, fontSize);
         
         settings.antialiased = true;
@@ -523,4 +607,43 @@ public:
 			return returnSize;
 		}
 	}
+    
+    /* CONVERSIONS */
+    double stringToDouble(string s) {
+        
+        double d;
+        stringstream cur;
+        cur.precision(20);
+        cur << s;
+        cur >> d;
+        return d;
+        
+    }
+    float stringToFloat(string s) {
+        
+        float f;
+        stringstream cur;
+        cur.precision(20);
+        cur << s;
+        cur >> f;
+        return f;
+        
+    }
+    
+    string doubleToString(double d){
+        string s;
+        stringstream cur;
+        cur.precision(20);
+        cur << d;
+        cur >> s;
+        return s;
+    }
+    string floatToString(float d){
+        string s;
+        stringstream cur;
+        cur.precision(20);
+        cur << d;
+        cur >> s;
+        return s;
+    }
 };
