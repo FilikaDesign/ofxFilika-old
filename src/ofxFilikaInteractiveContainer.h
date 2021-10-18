@@ -61,35 +61,30 @@ class ofxFilikaInteractiveContainer : public ofRectangle {
 private:
 	bool isMouseEventsEnabled;
 	bool isTouchEventsEnabled;
-	bool isMouseEnabled;
-	bool isTouchEnabled;
 
 	bool				   _isMouseOver;					 // is mouse over the rect
 	std::map<int, bool>    _isMousePressed;					 // is mouse down over the rect (for any given mouse button)
 	unsigned long		   _stateChangeTimestampMillis;
 public:
-	bool isInteractionEnabled;
 
 	//--------------------------------------------------------------
 	void enableInteraction() {
-		if (!isInteractionEnabled)
+		if (!isTouchEventsEnabled || !isMouseEventsEnabled)
 		{
 			enableTouchEvents();
 			enableMouseEvents();
 			isTouchEventsEnabled = true;
 			isMouseEventsEnabled = true;
-			isInteractionEnabled = true;
 		}
 	}
 
 	void disableInteraction() {
-		if (isInteractionEnabled)
+		if (isTouchEventsEnabled || isMouseEventsEnabled)
 		{
 			disableTouchEvents();
 			disableMouseEvents();
 			isTouchEventsEnabled = false;
 			isMouseEventsEnabled = false;
-			isInteractionEnabled = false;
 		}
 	}
 
@@ -166,8 +161,6 @@ public:
 
 	//--------------------------------------------------------------
 	ofxFilikaInteractiveContainer() {
-		isMouseEnabled = false;
-		isTouchEnabled = false;
 		isTouchEventsEnabled = false;
 		isMouseEventsEnabled = false;
 		//enableMouseEvents();
