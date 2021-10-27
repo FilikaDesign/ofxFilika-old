@@ -241,6 +241,15 @@ public:
             isSaved = true;
         }
     }
+
+	/* RESIZE IMAGE PROPORTIONALLY */
+	glm::vec2 calculateAspectRatio(float maxW, float maxH, float srcW, float srcH) {
+		float w, h;
+		float ratio = min(maxW / srcW, maxH / srcH);
+		w = srcW * ratio;
+		h = srcH * ratio;
+		return glm::vec2(w,h);
+	}
     
 	/* STRING OPERATIONS */
 	/* Save ofxFilikaUtils.h file as unicode-(without signature) */
