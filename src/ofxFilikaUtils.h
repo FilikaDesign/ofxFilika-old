@@ -11,6 +11,7 @@
 
 #include "ofMain.h"
 #include "ofxFilikaConstants.h"
+#include "ofxFilikaEvents.h"
 
 #define SECS_PER_MIN 60
 #define SECS_PER_HOUR 3600
@@ -24,7 +25,7 @@ private:
     ofFbo largeOffscreenImage;
     int resX,resY;
     string fName, fDest;
-    
+
 public:
     bool isSaved;
 	ofXml xml;
@@ -510,6 +511,7 @@ public:
         
         return result;
     }
+
     
     ofTrueTypeFont getTurkishFont(string fontName, int fontSize) {
         
