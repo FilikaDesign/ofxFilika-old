@@ -72,7 +72,7 @@ public:
 		ofPopStyle();
 	}
 
-	void startCounter() { disableCounter = false; }
+	void startCounter() { disableCounter = false; counterVal = startVal + 1;}
 	void stopCounter() { disableCounter = true; }
 	//void restartCounter() {}
 private:
