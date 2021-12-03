@@ -182,14 +182,14 @@ public:
 	}
 
 
-	void sendMail(string mailTo, string dirName, string fileName) {
+	void sendMail(string mailTo, string fileName) {
 
 		//senderInfo = "Herr Artut<" + mailTo + ">";
 		//C = senderInfo.c_str(); // Sender Info
 
 		senderEmailAddress = mailTo;
 	
-		imgPath = "D:\\Development\\of_v0.11.2_vs2017_release\\apps\\ziraat_Izmir_Projects\\ziraat_GreenScreen\\bin\\data\\" + dirName + "\\" + fileName;
+		imgPath = "D:\\Development\\of_v0.11.2_vs2017_release\\apps\\ziraat_Izmir_Projects\\ziraat_GreenScreen\\bin\\data\\" + fileName;// + dirName + "\\" + fileName;
 		//imgPath = fileName;
 		startThread();
 		stopThread();

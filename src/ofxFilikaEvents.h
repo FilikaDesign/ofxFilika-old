@@ -10,6 +10,7 @@ public:
 	ofEvent<void> ON_COUNTER_DONE;
 	//ofEvent<int> ON_COUNTER_TICK;
 
+	ofEvent<string> ON_TEXT_RETURN;
 
 };
 
