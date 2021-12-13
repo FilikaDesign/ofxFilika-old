@@ -11,7 +11,7 @@ public:
 	//ofEvent<int> ON_COUNTER_TICK;
 
 	ofEvent<string> ON_TEXT_RETURN;
-
+	ofEvent<int> ON_INT_RETURN;
 };
 
 /*
