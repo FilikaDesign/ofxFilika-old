@@ -84,7 +84,7 @@ public:
 	}
 
 	void animate() {
-
+		mainColor = ofColor(80, 81, 81);;
 
 		animateValX = -wt;
 		animateEndVal = animateValX;
@@ -214,7 +214,7 @@ public:
 	////////////////////////////////////////////////
 	bool hit(int _x, int _y) {
 
-		result = (_x < xpos + wt * 0.5 && _x > xpos - wt * 0.5 && _y > ypos - ht * 0.5 && _y < ypos + ht * 0.5) ? true : false;
+		result = (_x < xpos + wt && _x > xpos && _y > ypos - ht * 0.5 && _y < ypos + ht * 0.5) ? true : false;
 
 		return result;
 	}
@@ -228,16 +228,20 @@ public:
 		xpos = _x;
 		ypos = _y;
 
+		ofPushStyle();
+		//ofSetColor(ofColor::red);
+		//ofDrawRectangle(_x, _y, wt, ht);
+		ofPopStyle();
+		
 		ofPushMatrix();
 		ofTranslate(_x, _y);
-
 		ofScale(scaleFac, scaleFac);
 
 		//ofScale(abs(sin(ofGetElapsedTimef())*2),abs(sin(ofGetElapsedTimef())*2));
 		ofPushStyle();
 		ofEnableAlphaBlending();
 
-		ofSetColor(ofColor(199, 138, 62, tAlpha));
+		ofSetColor(ofColor(gRed.r, gRed.g, gRed.b, tAlpha));
 		int moveFac;
 		if (myText.lines.size() > 1) {
 			moveFac = -25;
@@ -245,7 +249,7 @@ public:
 		else {
 			moveFac = -15;
 		}
-		ofDrawRectRounded(ofRectangle(-wt * 0.5 - 9, moveFac, 3, ht - size), 20, 20, 20, 20);
+		ofDrawRectRounded(ofRectangle( - 9, moveFac, 4, ht - size), 20, 20, 20, 20);
 
 		/*if (animateValX < animateEndVal) {
 			animateValX
@@ -267,7 +271,7 @@ public:
 
 		textFbo.getTexture().setAlphaMask(mask.getTexture());
 
-		textFbo.draw(-wt * 0.5, -ht * 0.5);
+		textFbo.draw(0, -ht * 0.5);
 
 		/*if (isSelected) {
 			ofScale((1/ scaleFac), (1 / scaleFac));
@@ -369,7 +373,7 @@ public:
 		hit(touch_x, touch_y);
 		if (result) {
 
-			mainColor = ofColor(208, 142, 0);
+			mainColor = ofColor(177, 41, 46);
 
 			if (!isSelected)
 				scaleFac = 1;

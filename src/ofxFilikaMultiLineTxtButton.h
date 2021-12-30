@@ -23,7 +23,7 @@ public:
 
 		content.init(&_bold30);								// Set default font for the content text box
 		content.setLineHeight(32);
-		content.wrapTextX(width);							// Wrap textbox width to 900
+		content.wrapTextX(width);							// Wrap textbox width to width
 
 
 

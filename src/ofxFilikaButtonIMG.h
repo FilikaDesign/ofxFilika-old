@@ -34,7 +34,7 @@ public:
 		ofScale(1 + sFac, 1 + sFac);
 		ofTranslate(-this->width*0.5, -this->height*0.5);
 		// Draw texture to 0,0 to enable scale animation from center
-		btnTex.draw(0, 0);
+		btnTex.draw(0, 0, this->width, this->height);
 		ofPopMatrix();
 
 		// Override draw function
