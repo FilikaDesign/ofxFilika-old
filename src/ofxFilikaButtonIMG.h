@@ -4,16 +4,30 @@
 #include "ofxFilikaInteractiveContainer.h"
 #include "ofxFilikaEvents.h"
 
+
+
 class ofxFilikaButtonIMG : public ofxFilikaInteractiveContainer, public ofxFilikaEvents {
 public:
 	float sFac;
 	ofImage btnTex;
+	//ofxThreadedImageLoader * loader;
+
+	ofxFilikaButtonIMG() {}
+	//ofxFilikaButtonIMG(ofxFilikaButtonIMG&&) = default;
+	//ofxFilikaButtonIMG(const ofxFilikaButtonIMG &) = default;
+
+
+	//ofxFilikaButtonIMG(const ofxFilikaButtonIMG&) = default;
+	//ofxFilikaButtonIMG& operator=(const ofxFilikaButtonIMG&) = default;
+
+	~ofxFilikaButtonIMG() {
+		//loader.stopThread();
+	}
 
 	void setup(string src) {
 		// Override setup function
 		enableMouseEvents();	// to enable mouse events
 		enableTouchEvents();	// to enable touch events
-
 
 		// Load button image texture
 		btnTex.load(src);
@@ -34,7 +48,10 @@ public:
 		ofScale(1 + sFac, 1 + sFac);
 		ofTranslate(-this->width*0.5, -this->height*0.5);
 		// Draw texture to 0,0 to enable scale animation from center
-		btnTex.draw(0, 0, this->width, this->height);
+
+		if(btnTex.isAllocated() && btnTex.getWidth() > 0) {
+			btnTex.draw(0, 0, this->width, this->height);
+		}
 		ofPopMatrix();
 
 		// Override draw function
