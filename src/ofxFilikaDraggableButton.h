@@ -47,7 +47,7 @@ public:
 
 	ofEvent<int> BUTTON_TOUCH_DOWN;
 	ofEvent<int> BUTTON_TOUCH_UP;
-    ofEvent<ofVec2f> BUTTON_DRAGGING;
+    ofEvent<glm::vec2> BUTTON_DRAGGING;
 
 	ofColor mainColor;
     ofColor _OVER_COLOR;
@@ -63,7 +63,7 @@ public:
     
 	ofImage imge;
 	ofImage imgePassive;
-	ofVec2f pivotPoint;
+	glm::vec2 pivotPoint;
 
 	////////////////////////////////////////////////
 	// SETTERS & GETTERS
@@ -205,8 +205,8 @@ public:
 		return _h;
 	}
 
-	ofVec2f getPos() {
-		return ofVec2f(xpos, ypos);
+	glm::vec2 getPos() {
+		return glm::vec2(xpos, ypos);
 	}
 
 	string getSourcePath() {
@@ -238,7 +238,7 @@ public:
     ////////////////////////////////////////////////
     // SETUP
     ////////////////////////////////////////////////
-    void setup(ofVec2f _size, int _id, ofColor _mainColor = ofColor(0), bool _isAnimatable = false) {
+    void setup(glm::vec2 _size, int _id, ofColor _mainColor = ofColor(0), bool _isAnimatable = false) {
         
         _OUT_COLOR = _mainColor;
         _OVER_COLOR = ofColor(0, 100, 0, 255);
@@ -357,7 +357,7 @@ public:
 	// SETTERS & GETTERS
 	////////////////////////////////////////////////
 	void draw(int _x, int _y) {
-        
+		ofPushStyle();
         
         xpos = _x + pivotPoint.x; // Set position according to pivot value. Default: 0,0
         ypos = _y + pivotPoint.y;
@@ -415,13 +415,11 @@ public:
         }
 		
 		ofPopMatrix();
+
+		ofPopStyle();
 	}
     
-    /*void draw() {
-        
-    }*/
-
-
+   
 	////////////////////////////////////////////////
 	// INTERACTION
 	////////////////////////////////////////////////
@@ -500,7 +498,7 @@ public:
 			if (isDraggingH) {
 				xpos = _x - saveX;
 			}
-			ofVec2f p = ofVec2f(xpos, ypos);
+			glm::vec2 p = glm::vec2(xpos, ypos);
 			ofNotifyEvent(BUTTON_DRAGGING, p, this);
         }
     }
