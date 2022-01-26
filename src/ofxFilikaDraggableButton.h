@@ -147,6 +147,11 @@ public:
         setInteractionArea(glm::vec2(_w, _h));
         setPivot(pivot);
     }
+
+	void setImage(string src) {
+		imge.load(src);
+		imge.resize(_w, _h);
+	}
     
 	void setPassiveImage(string src) {
 		imgePassive.load(src);

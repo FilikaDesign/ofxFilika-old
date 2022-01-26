@@ -1,4 +1,5 @@
 #pragma once
+#include "ofxFilikaConstants.h"
 
 class ofxFilikaEvents
 {
@@ -12,16 +13,11 @@ public:
 
 	ofEvent<string> ON_TEXT_RETURN;
 	ofEvent<int> ON_INT_RETURN;
+
+	// Inherits from "ofxFilikaConstants
+	// SWIPE_UP
+	// SWIPE_DOWN
+	// SWIPE_LEFT
+	// SWIPE_RIGHT
+	ofEvent<ofxFilikaTouchGestures> ON_SWIPE;
 };
-
-/*
-#include "ofMain.h"
-
-class imageViewInfo {
-public:
-	string vidSource;
-	int btnId;
-};
-
-static ofEvent<imageViewInfo> IMAGE_ITEM_CLICKED;
-*/
