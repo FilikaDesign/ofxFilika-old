@@ -19,5 +19,5 @@ public:
 	// SWIPE_DOWN
 	// SWIPE_LEFT
 	// SWIPE_RIGHT
-	ofEvent<ofxFilikaTouchGestures> ON_SWIPE;
+	ofEvent<void> ON_SWIPE;
 };

@@ -203,6 +203,8 @@ public:
 	virtual void onReleaseOutside(int x, int y, int button) {}  // called when mouse releases outside of object after being pressed on object
 	//virtual void onKeyPress(int key) {}                         // called when keypressed while mouse over the object
 	//virtual void onKeyRelease(int key) {}                        // called when keyreleased while mouse over the object
+	virtual void onGlobalMouseMove(int x, int y) {}
+	//virtual void onDrag(int x, int y) {}
 
 	private: 
 		void _mouseMoved(ofMouseEventArgs &e) {
@@ -322,6 +324,7 @@ public:
 				_isMouseOver = false;						// update flag
 			}
 
+			onGlobalMouseMove(x, y);
 			_stateChangeTimestampMillis = ofGetElapsedTimeMillis();
 
 			//mouseMoved(x, y);
