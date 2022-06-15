@@ -87,9 +87,9 @@ public:
 		swipeSpd.x = touchEnd.x - touchStart.x;
 		swipeSpd.y = touchEnd.y - touchStart.y;
 		float speedG = ofDist(touchStart.x, touchStart.y, touchEnd.x, touchEnd.y);
-		ofLog() << "horz speed: " << swipeSpd.x;
-		ofLog() << "vert speed: " << swipeSpd.y;
-		ofLog() << "median speed: " << ofDist(touchStart.x, touchStart.y, touchEnd.x, touchEnd.y);
+		//ofLog() << "horz speed: " << swipeSpd.x;
+		//ofLog() << "vert speed: " << swipeSpd.y;
+		//ofLog() << "median speed: " << ofDist(touchStart.x, touchStart.y, touchEnd.x, touchEnd.y);
 
 		isDownStart = false;
 

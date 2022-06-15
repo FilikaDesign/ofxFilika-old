@@ -4,11 +4,12 @@
 
 class ofxFilikaTextField {
 private:
-	ofxTextBlock				content;
+	
 	ofColor						color;
 	string txt;
 	ofTrueTypeFont* f;
 public:
+	ofxTextBlock				content;
 	void setup(ofTrueTypeFont & _f, int fSize, int fWidth, string txt, ofColor color = ofColor(100)) {
 		this->color = color;
 		this->txt = txt;
